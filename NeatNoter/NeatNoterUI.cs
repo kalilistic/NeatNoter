@@ -186,7 +186,7 @@ namespace NeatNoter
 
             DrawTabBar();
 
-            ImGui.InputText("Search", ref this.searchEntry, (uint)this.searchEntry.Length + 1);
+            ImGui.InputText("Search", ref this.searchEntry, 128);
 
             var includeBodies = this.config.IncludeNoteBodiesInSearch;
             if (ImGui.Checkbox("Include note contents in search", ref includeBodies))
@@ -362,7 +362,7 @@ namespace NeatNoter
                 return false;
 
             var ret = false;
-            
+
             ImGui.Begin("NeatNoter Deletion Confirmation", ImGuiWindowFlags.NoResize);
 
             ImGui.Text("Are you sure you want to delete this?");
@@ -386,14 +386,14 @@ namespace NeatNoter
         private static void DrawDocumentEditor(UniqueDocument item)
         {
             var title = item.Name;
-            if (ImGui.InputText(item.GetTypeName() + " Title", ref title, (uint)title.Length + 1))
+            if (ImGui.InputText(item.GetTypeName() + " Title", ref title, 128))
             {
                 item.Name = title;
             }
 
             var body = item.Body;
-            if (ImGui.InputTextMultiline(string.Empty, ref body, (uint)body.Length + 1,
-                new Vector2(ElementSizeX, WindowSizeY - 94)))
+            if (ImGui.InputTextMultiline(string.Empty, ref body, 1024 * 6, // TODO figure out how to make it scroll and only output a part at a time
+                new Vector2(ElementSizeX, WindowSizeY - 94), ImGuiInputTextFlags.AllowTabInput)) // TODO figure out how to auto word-wrap
             {
                 item.Body = body;
             }
