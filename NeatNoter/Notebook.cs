@@ -28,7 +28,7 @@ namespace NeatNoter
                 Body = string.Empty,
                 Categories = new List<Category>(),
             };
-            Notes.Add(note);
+            Notes.Insert(0, note);
             return note;
         }
 
@@ -42,9 +42,9 @@ namespace NeatNoter
             {
                 InternalName = "New Category##" + uid,
                 Body = "Category description",
-                Color = new Vector3(colorBytes[0], colorBytes[1], colorBytes[2]), // TODO make not wrong
+                Color = new Vector3(colorBytes[0], colorBytes[1], colorBytes[2]), // TODO make not random
             };
-            Categories.Add(category);
+            Categories.Insert(0, category);
             return category;
         }
 
