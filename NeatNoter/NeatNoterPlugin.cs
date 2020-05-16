@@ -1,8 +1,6 @@
 ﻿using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using System;
-using System.Linq;
-using Dalamud.Game.ClientState.Actors.Types;
 
 namespace NeatNoter
 {

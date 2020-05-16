@@ -12,6 +12,8 @@ namespace NeatNoter
     {
         private const int MaxNoteSize = 1024 * 4196; // You can fit the complete works of Shakespeare in 3.5MB, so this is probably fine.
 
+        private static readonly uint TextColor = ImGui.GetColorU32(ImGuiCol.Text);
+        
         private static float WindowSizeY => ImGui.GetWindowSize().Y;
         private static float ElementSizeX => ImGui.GetWindowSize().X - 16;
 
@@ -260,25 +262,29 @@ namespace NeatNoter
                 ? new Vector4(note.Categories[0].Color, 0.5f)
                 : new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
             ImGui.PushStyleColor(ImGuiCol.Button, color);
+
             var buttonLabel = note.Name;
-            for (var i = 1; i < Math.Min(note.Name.Length, 70) && ImGui.CalcTextSize(buttonLabel).X > lineOffset - 30; i++)
-                buttonLabel = note.Name.Substring(0, note.Name.Length - i) + "...";
+            var cutNameLength = Math.Min(note.Name.Length, 70);
+            for (var i = 1; i < cutNameLength && ImGui.CalcTextSize(buttonLabel).X > lineOffset - 30; i++)
+                buttonLabel = note.Name.Substring(0, cutNameLength - i) + "...";
             if (ImGui.Button(note.IdentifierString, new Vector2((int)Math.Truncate(ImGui.GetScrollMaxY()) != 0 ? ElementSizeX - 16 : ElementSizeX, 25)))
             {
                 OpenNote(note);
             }
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip(note.Name);
+
             ImGui.PopStyleColor();
             
             // Adding the text over manually because otherwise the text position is dependent on label length
-            ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset - ElementSizeX / 3.92f, index * heightMod + heightOffset + 4), ImGui.GetColorU32(ImGuiCol.Text), buttonLabel);
-            ImGui.GetWindowDrawList().AddLine(windowPos + new Vector2(lineOffset, index * heightMod + heightOffset), windowPos + new Vector2(lineOffset, index * heightMod + heightOffset + 25), ImGui.GetColorU32(ImGuiCol.Text));
+            ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset - ElementSizeX / 3.92f, index * heightMod + heightOffset + 4), TextColor, buttonLabel);
+            ImGui.GetWindowDrawList().AddLine(windowPos + new Vector2(lineOffset, index * heightMod + heightOffset), windowPos + new Vector2(lineOffset, index * heightMod + heightOffset + 25), TextColor);
             
             var contentPreview = note.Body.Replace('\n', ' ');
-            for (var i = 1; i < Math.Min(note.Body.Length, 70) && ImGui.CalcTextSize(contentPreview).X > ElementSizeX - lineOffset - 22; i++)
-                contentPreview = note.Body.Replace('\n', ' ').Substring(0, note.Body.Length - i) + "...";
-            ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset + 10, index * heightMod + heightOffset + 4), ImGui.GetColorU32(ImGuiCol.Text), contentPreview);
+            var cutBodyLength = Math.Min(note.Body.Length, 400);
+            for (var i = 1; i < cutBodyLength && ImGui.CalcTextSize(contentPreview).X > ElementSizeX - lineOffset - 22; i++)
+                contentPreview = note.Body.Replace('\n', ' ').Substring(0, cutBodyLength - i) + "...";
+            ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset + 10, index * heightMod + heightOffset + 4), TextColor, contentPreview);
 
             if (ImGui.BeginPopupContextItem("NeatNoter Note Neater Menu##" + note.IdentifierString))
             {
@@ -345,17 +351,21 @@ namespace NeatNoter
 
             var color = new Vector4(category.Color, 0.5f);
             ImGui.PushStyleColor(ImGuiCol.Button, ImGui.GetColorU32(color));
+
             var buttonLabel = category.Name;
-            for (var i = 1; i < Math.Min(category.Name.Length, 70) && ImGui.CalcTextSize(buttonLabel).X > ElementSizeX - 22; i++)
-                buttonLabel = category.Name.Substring(0, category.Name.Length - i) + "...";
+            var cutNameLength = Math.Min(category.Name.Length, 70);
+            for (var i = 1; i < cutNameLength && ImGui.CalcTextSize(buttonLabel).X > ElementSizeX - 22; i++)
+                buttonLabel = category.Name.Substring(0, cutNameLength - i) + "...";
             if (ImGui.Button(category.IdentifierString, new Vector2((int)Math.Truncate(ImGui.GetScrollMaxY()) != 0 ? ElementSizeX - 16 : ElementSizeX, 25)))
             {
                 OpenCategory(category);
             }
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip(category.Body);
+
             ImGui.PopStyleColor();
-            ImGui.GetWindowDrawList().AddText(ImGui.GetWindowPos() + new Vector2(ElementSizeX * 0.045f, index * heightMod + heightOffset + 4), ImGui.GetColorU32(ImGuiCol.Text), buttonLabel);
+
+            ImGui.GetWindowDrawList().AddText(ImGui.GetWindowPos() + new Vector2(ElementSizeX * 0.045f, index * heightMod + heightOffset + 4), TextColor, buttonLabel);
 
             if (ImGui.BeginPopupContextItem("NeatNoter Category Neater Menu##" + category.IdentifierString))
             {
