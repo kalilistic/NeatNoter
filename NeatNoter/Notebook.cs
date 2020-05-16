@@ -36,13 +36,11 @@ namespace NeatNoter
         {
             var uid = DateTime.Now.ToBinary();
             var rand = new Random();
-            var colorBytes = new byte[3];
-            rand.NextBytes(colorBytes);
             var category = new Category
             {
                 InternalName = "New Category##" + uid,
                 Body = "Category description",
-                Color = new Vector3(colorBytes[0], colorBytes[1], colorBytes[2]), // TODO make not random
+                Color = new Vector3((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble()),
             };
             Categories.Insert(0, category);
             return category;
