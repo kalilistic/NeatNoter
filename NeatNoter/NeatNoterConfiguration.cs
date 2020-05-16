@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Dalamud.Configuration;
 using Dalamud.Plugin;
 using NeatNoter.Models;
@@ -27,10 +29,28 @@ namespace NeatNoter
         public void Initialize(DalamudPluginInterface pluginInterface)
         {
             this.pluginInterface = pluginInterface;
+
+            foreach (var category in Categories)
+            {
+                category.DecompressBody();
+            }
+            foreach (var note in Notes)
+            {
+                note.DecompressBody();
+            }
         }
 
         public void Save()
         {
+            foreach (var category in Categories)
+            {
+                category.CompressBody();
+            }
+            foreach (var note in Notes)
+            {
+                note.CompressBody();
+            }
+
             this.pluginInterface.SavePluginConfig(this);
         }
     }

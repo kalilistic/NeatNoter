@@ -26,6 +26,8 @@ namespace NeatNoter
 
             this.ui = new NeatNoterUI(this.notebook, this.config);
             this.pluginInterface.UiBuilder.OnBuildUi += this.ui.Draw;
+
+            // this.pluginInterface.ClientState.Actors.Where(actor => (actor as PlayerCharacter).Address) // Aye not now, this is a pain
             
             AddComandHandlers();
         }

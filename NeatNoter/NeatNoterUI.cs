@@ -10,6 +10,11 @@ namespace NeatNoter
 {
     internal class NeatNoterUI : IDisposable
     {
+        private const int MaxNoteSize = 1024 * 4196; // You can fit the complete works of Shakespeare in 3.5MB, so this is probably fine.
+
+        private static float WindowSizeY => ImGui.GetWindowSize().Y;
+        private static float ElementSizeX => ImGui.GetWindowSize().X - 16;
+
         private readonly NeatNoterConfiguration config;
         private readonly Notebook notebook;
         private readonly Timer saveTimer;
@@ -22,10 +27,10 @@ namespace NeatNoter
         private string searchEntry;
         private UIState lastState;
         private UIState state;
-
-        private static float WindowSizeY => ImGui.GetWindowSize().Y;
-        private static float ElementSizeX => ImGui.GetWindowSize().X - 16;
+        
         public bool IsVisible { get; set; }
+        public bool IsCharacterNoteWindowVisible { get; set; }
+        public Vector2 CurrentCharacterScreenPos { get; set; }
 
         public NeatNoterUI(Notebook notebook, NeatNoterConfiguration config)
         {
@@ -46,6 +51,7 @@ namespace NeatNoter
 #if DEBUG
             IsVisible = true;
 #endif
+            CurrentCharacterScreenPos = Vector2.Zero;
         }
 
         public void Draw()
@@ -54,6 +60,8 @@ namespace NeatNoter
 
             if (!IsVisible)
                 return;
+
+            DrawMiniEditor(CurrentCharacterScreenPos);
 
             ImGui.SetNextWindowSize(new Vector2(400, 600), ImGuiCond.FirstUseEver);
             ImGui.Begin("NeatNoter");
@@ -266,9 +274,9 @@ namespace NeatNoter
             // Adding the text over manually because otherwise the text position is dependent on label length
             ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset - ElementSizeX / 3.92f, index * heightMod + heightOffset + 4), ImGui.GetColorU32(ImGuiCol.Text), buttonLabel);
             ImGui.GetWindowDrawList().AddLine(windowPos + new Vector2(lineOffset, index * heightMod + heightOffset), windowPos + new Vector2(lineOffset, index * heightMod + heightOffset + 25), ImGui.GetColorU32(ImGuiCol.Text));
-            // This is super inefficient, TODO feex
+            
             var contentPreview = note.Body.Replace('\n', ' ');
-            for (var i = 1; i < Math.Min(note.Body.Length, 70) && ImGui.CalcTextSize(contentPreview).X > ElementSizeX - lineOffset - 10; i++)
+            for (var i = 1; i < Math.Min(note.Body.Length, 70) && ImGui.CalcTextSize(contentPreview).X > ElementSizeX - lineOffset - 22; i++)
                 contentPreview = note.Body.Replace('\n', ' ').Substring(0, note.Body.Length - i) + "...";
             ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset + 10, index * heightMod + heightOffset + 4), ImGui.GetColorU32(ImGuiCol.Text), contentPreview);
 
@@ -360,6 +368,35 @@ namespace NeatNoter
             }
         }
 
+        private void DrawMiniEditor(Vector2 windowPos)
+        {
+            if (!IsCharacterNoteWindowVisible)
+                return;
+
+            ImGui.SetNextWindowSize(new Vector2(300, 150), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowPos(windowPos, ImGuiCond.Appearing);
+
+            var isWindowVisible = IsCharacterNoteWindowVisible;
+            if (ImGui.Begin("NeatNoter Mini Editor", ref isWindowVisible))
+            {
+                IsCharacterNoteWindowVisible = isWindowVisible;
+            }
+
+            if (ImGui.Button(this.categoryWindowVisible ? "Close category selection" : "Choose categories", new Vector2(ElementSizeX, 23)))
+                this.categoryWindowVisible = !this.categoryWindowVisible;
+            IList<Category> categories = this.currentNote.Categories;
+            CategorySelectionWindow(ref categories);
+            this.currentNote.Categories = categories.ToList();
+
+            var body = this.currentNote.Body;
+            if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize, new Vector2(ElementSizeX, 101), ImGuiInputTextFlags.AllowTabInput))
+            {
+                this.currentNote.Body = body;
+            }
+            
+            ImGui.End();
+        }
+
         private void OpenCategory(Category category)
         {
             this.currentCategory = category;
@@ -370,6 +407,8 @@ namespace NeatNoter
         {
             if (newState == this.state)
                 return;
+
+            this.config.Save();
 
             this.deletionWindowVisible = false; // We want to disable these on state changes
             this.categoryWindowVisible = false;
@@ -416,8 +455,8 @@ namespace NeatNoter
             }
 
             var body = item.Body;
-            if (ImGui.InputTextMultiline(string.Empty, ref body, 1024 * 6, // TODO figure out how to make it scroll and only output a part at a time
-                new Vector2(ElementSizeX, WindowSizeY - 94), ImGuiInputTextFlags.AllowTabInput | ImGuiInputTextFlags.Multiline)) // TODO figure out how to auto word-wrap
+            if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize,
+                new Vector2(ElementSizeX, WindowSizeY - 94), ImGuiInputTextFlags.AllowTabInput))
             {
                 item.Body = body;
             }

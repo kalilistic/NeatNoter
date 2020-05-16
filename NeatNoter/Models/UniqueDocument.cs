@@ -1,4 +1,8 @@
 ﻿using System;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace NeatNoter.Models
@@ -19,7 +23,35 @@ namespace NeatNoter.Models
 
         public string InternalName { get; set; }
 
+        [JsonIgnore]
         public string Body { get; set; }
+
+        // ReSharper disable once MemberCanBePrivate.Global
+        public string InternalBody { get; set; }
+
+        public void CompressBody()
+        {
+            using var bodyStream = new MemoryStream(Encoding.UTF8.GetBytes(Body));
+            using var compressedBodyStream = new MemoryStream();
+
+            var gzipStream = new GZipStream(compressedBodyStream, CompressionMode.Compress);
+            bodyStream.CopyTo(gzipStream);
+            gzipStream.Dispose();
+
+            InternalBody = Convert.ToBase64String(compressedBodyStream.ToArray());
+        }
+
+        public void DecompressBody()
+        {
+            using var internalBodyStream = new MemoryStream(Convert.FromBase64String(InternalBody));
+            using var decompressedBodyStream = new MemoryStream();
+
+            var gzipStream = new GZipStream(internalBodyStream, CompressionMode.Decompress);
+            gzipStream.CopyTo(decompressedBodyStream);
+            gzipStream.Dispose();
+
+            Body = Encoding.UTF8.GetString(decompressedBodyStream.ToArray());
+        }
 
         [JsonIgnore] private string typeName; // Cached to avoid excessive reflection
 
