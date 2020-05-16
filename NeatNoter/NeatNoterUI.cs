@@ -10,10 +10,6 @@ namespace NeatNoter
 {
     internal class NeatNoterUI : IDisposable
     {
-        private const int WindowSizeX = 400;
-        private const int WindowSizeY = 600;
-        private const int ElementSizeX = 384;
-
         private readonly NeatNoterConfiguration config;
         private readonly Notebook notebook;
         private readonly Timer saveTimer;
@@ -27,6 +23,8 @@ namespace NeatNoter
         private UIState lastState;
         private UIState state;
 
+        private static float WindowSizeY => ImGui.GetWindowSize().Y;
+        private static float ElementSizeX => ImGui.GetWindowSize().X - 16;
         public bool IsVisible { get; set; }
 
         public NeatNoterUI(Notebook notebook, NeatNoterConfiguration config)
@@ -57,8 +55,8 @@ namespace NeatNoter
             if (!IsVisible)
                 return;
 
-            ImGui.SetNextWindowSize(new Vector2(WindowSizeX, WindowSizeY), ImGuiCond.Always);
-            ImGui.Begin("NeatNoter", ImGuiWindowFlags.NoResize);
+            ImGui.SetNextWindowSize(new Vector2(400, 600), ImGuiCond.FirstUseEver);
+            ImGui.Begin("NeatNoter");
             // ReSharper disable once AssignmentIsFullyDiscarded
             _ = this.state switch
             {
@@ -94,9 +92,9 @@ namespace NeatNoter
 
             ImGui.Separator();
 
-            foreach (var note in this.notebook.Notes)
+            for (var i = 0; i < this.notebook.Notes.Count; i++)
             {
-                DrawNoteEntry(note);
+                DrawNoteEntry(this.notebook.Notes[i], i, 89);
             }
 
             return true;
@@ -124,9 +122,9 @@ namespace NeatNoter
 
             ImGui.Separator();
 
-            foreach (var category in this.notebook.Categories)
+            for (var i = 0; i < this.notebook.Categories.Count; i++)
             {
-                DrawCategoryEntry(category);
+                DrawCategoryEntry(this.notebook.Categories[i], i, 89);
             }
 
             return true;
@@ -206,10 +204,11 @@ namespace NeatNoter
 
             var results = this.notebook
                 .SearchFor(this.searchEntry, this.config.IncludeNoteBodiesInSearch)
-                .FilterByCategories(this.filteredCategories);
-            foreach (var note in results)
+                .FilterByCategories(this.filteredCategories)
+                .ToList();
+            for (var i = 0; i < results.Count; i++)
             {
-                DrawNoteEntry(note);
+                DrawNoteEntry(results[i], i, 116);
             }
 
             return true;
@@ -241,19 +240,36 @@ namespace NeatNoter
             }
         }
 
-        private void DrawNoteEntry(Note note)
+        private void DrawNoteEntry(Note note, int index, int heightOffset)
         {
+            const int heightConstant = 29;
+
+            var lineOffset = ElementSizeX * 0.3f;
+            var windowPos = ImGui.GetWindowPos();
+
             var color = note.Categories.Count > 0
                 ? new Vector4(note.Categories[0].Color, 0.5f)
                 : new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
             ImGui.PushStyleColor(ImGuiCol.Button, color);
-            ImGui.PushStyleVar(ImGuiStyleVar.ButtonTextAlign, new Vector2(0.03f, 0.5f)); // Left-align the button text
-            if (ImGui.Button(note.InternalName, new Vector2(ElementSizeX, 25)))
+            var buttonLabel = note.Name;
+            for (var i = 1; i < Math.Min(note.Name.Length, 70) && ImGui.CalcTextSize(buttonLabel).X > lineOffset - 30; i++)
+                buttonLabel = note.Name.Substring(0, note.Name.Length - i) + "...";
+            if (ImGui.Button(note.IdentifierString, new Vector2(ElementSizeX, 25)))
             {
                 OpenNote(note);
             }
-            ImGui.PopStyleVar();
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip(note.Name);
             ImGui.PopStyleColor();
+            
+            // Adding the text over manually because otherwise the text position is dependent on label length
+            ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset - ElementSizeX / 3.92f, index * heightConstant + heightOffset + 4), ImGui.GetColorU32(ImGuiCol.Text), buttonLabel);
+            ImGui.GetWindowDrawList().AddLine(windowPos + new Vector2(lineOffset, index * heightConstant + heightOffset), windowPos + new Vector2(lineOffset, index * heightConstant + heightOffset + 25), ImGui.GetColorU32(ImGuiCol.Text));
+            // This is super inefficient, TODO feex
+            var contentPreview = note.Body.Replace('\n', ' ');
+            for (var i = 1; i < Math.Min(note.Body.Length, 70) && ImGui.CalcTextSize(contentPreview).X > ElementSizeX - lineOffset - 10; i++)
+                contentPreview = note.Body.Replace('\n', ' ').Substring(0, note.Body.Length - i) + "...";
+            ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset + 10, index * heightConstant + heightOffset + 4), ImGui.GetColorU32(ImGuiCol.Text), contentPreview);
 
             if (ImGui.BeginPopupContextItem("NeatNoter Note Neater Menu##" + note.IdentifierString))
             {
@@ -313,17 +329,23 @@ namespace NeatNoter
         /// <summary>
         /// Called from <see cref="DrawCategoryIndex"/>. Draws the category entry.
         /// </summary>
-        private void DrawCategoryEntry(Category category)
+        private void DrawCategoryEntry(Category category, int index, int heightOffset)
         {
+            const int heightConstant = 29;
+
             var color = new Vector4(category.Color, 0.5f);
             ImGui.PushStyleColor(ImGuiCol.Button, ImGui.GetColorU32(color));
-            ImGui.PushStyleVar(ImGuiStyleVar.ButtonTextAlign, new Vector2(0.03f, 0.5f)); // Left-align the button text
-            if (ImGui.Button(category.InternalName, new Vector2(ElementSizeX, 25)))
+            var buttonLabel = category.Name;
+            for (var i = 1; i < Math.Min(category.Name.Length, 70) && ImGui.CalcTextSize(buttonLabel).X > ElementSizeX - 22; i++)
+                buttonLabel = category.Name.Substring(0, category.Name.Length - i) + "...";
+            if (ImGui.Button(category.IdentifierString, new Vector2(ElementSizeX, 25)))
             {
                 OpenCategory(category);
             }
-            ImGui.PopStyleVar();
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip(category.Body);
             ImGui.PopStyleColor();
+            ImGui.GetWindowDrawList().AddText(ImGui.GetWindowPos() + new Vector2(ElementSizeX * 0.045f, index * heightConstant + heightOffset + 4), ImGui.GetColorU32(ImGuiCol.Text), buttonLabel);
 
             if (ImGui.BeginPopupContextItem("NeatNoter Category Neater Menu##" + category.IdentifierString))
             {
@@ -393,7 +415,7 @@ namespace NeatNoter
 
             var body = item.Body;
             if (ImGui.InputTextMultiline(string.Empty, ref body, 1024 * 6, // TODO figure out how to make it scroll and only output a part at a time
-                new Vector2(ElementSizeX, WindowSizeY - 94), ImGuiInputTextFlags.AllowTabInput)) // TODO figure out how to auto word-wrap
+                new Vector2(ElementSizeX, WindowSizeY - 94), ImGuiInputTextFlags.AllowTabInput | ImGuiInputTextFlags.Multiline)) // TODO figure out how to auto word-wrap
             {
                 item.Body = body;
             }
