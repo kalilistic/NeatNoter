@@ -31,8 +31,6 @@ namespace NeatNoter
         private UIState state;
         
         public bool IsVisible { get; set; }
-        public bool IsCharacterNoteWindowVisible { get; set; }
-        public Vector2 CurrentCharacterScreenPos { get; set; }
 
         public NeatNoterUI(Notebook notebook, NeatNoterConfiguration config)
         {
@@ -53,7 +51,6 @@ namespace NeatNoter
 #if DEBUG
             IsVisible = true;
 #endif
-            CurrentCharacterScreenPos = Vector2.Zero;
         }
 
         public void Draw()
@@ -62,8 +59,6 @@ namespace NeatNoter
 
             if (!IsVisible)
                 return;
-
-            DrawMiniEditor(CurrentCharacterScreenPos);
 
             ImGui.SetNextWindowSize(new Vector2(400, 600), ImGuiCond.FirstUseEver);
             ImGui.Begin("NeatNoter");
@@ -376,35 +371,6 @@ namespace NeatNoter
                 }
                 ImGui.EndPopup();
             }
-        }
-
-        private void DrawMiniEditor(Vector2 windowPos)
-        {
-            if (!IsCharacterNoteWindowVisible)
-                return;
-
-            ImGui.SetNextWindowSize(new Vector2(300, 150), ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowPos(windowPos, ImGuiCond.Appearing);
-
-            var isWindowVisible = IsCharacterNoteWindowVisible;
-            if (ImGui.Begin("NeatNoter Mini Editor", ref isWindowVisible))
-            {
-                IsCharacterNoteWindowVisible = isWindowVisible;
-            }
-
-            if (ImGui.Button(this.categoryWindowVisible ? "Close category selection" : "Choose categories", new Vector2(ElementSizeX, 23)))
-                this.categoryWindowVisible = !this.categoryWindowVisible;
-            IList<Category> categories = this.currentNote.Categories;
-            CategorySelectionWindow(ref categories);
-            this.currentNote.Categories = categories.ToList();
-
-            var body = this.currentNote.Body;
-            if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize, new Vector2(ElementSizeX, 101), ImGuiInputTextFlags.AllowTabInput))
-            {
-                this.currentNote.Body = body;
-            }
-            
-            ImGui.End();
         }
 
         private void OpenCategory(Category category)

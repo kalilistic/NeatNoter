@@ -1,6 +1,8 @@
 ﻿using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using System;
+using System.Runtime.InteropServices;
+using Dalamud.Game.Internal;
 
 namespace NeatNoter
 {
@@ -24,8 +26,6 @@ namespace NeatNoter
 
             this.ui = new NeatNoterUI(this.notebook, this.config);
             this.pluginInterface.UiBuilder.OnBuildUi += this.ui.Draw;
-
-            // this.pluginInterface.ClientState.Actors.Where(actor => (actor as PlayerCharacter).Address) // Aye not now, this is a pain
             
             AddComandHandlers();
         }
@@ -56,7 +56,7 @@ namespace NeatNoter
             {
                 RemoveCommandHandlers();
                 
-                //this.pluginInterface.SavePluginConfig(this.config);
+                this.pluginInterface.SavePluginConfig(this.config);
 
                 this.pluginInterface.UiBuilder.OnBuildUi -= this.ui.Draw;
                 this.ui.Dispose();
