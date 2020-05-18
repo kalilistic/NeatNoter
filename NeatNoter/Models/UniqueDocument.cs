@@ -66,7 +66,7 @@ namespace NeatNoter.Models
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            return GetTypeName() == other.GetTypeName() && InternalName == other.InternalName && Body == other.Body;
+            return GetTypeName() == other.GetTypeName() && InternalName == other.InternalName;
         }
 
         public override bool Equals(object obj)
