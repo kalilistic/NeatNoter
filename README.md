@@ -5,3 +5,11 @@ NOTE: This plugin currently stores data in its configuration. Please make period
 
 ## Usage
 `/notebook` - Opens/closes the notebook.
+
+
+## Screenshots
+![Screenshot](https://raw.githubusercontent.com/karashiiro/NeatNoter/master/Assets/0.png)
+![Screenshot](https://raw.githubusercontent.com/karashiiro/NeatNoter/master/Assets/1.png)
+![Screenshot](https://raw.githubusercontent.com/karashiiro/NeatNoter/master/Assets/2.png)
+![Screenshot](https://raw.githubusercontent.com/karashiiro/NeatNoter/master/Assets/3.png)
+![Screenshot](https://raw.githubusercontent.com/karashiiro/NeatNoter/master/Assets/4.png)
