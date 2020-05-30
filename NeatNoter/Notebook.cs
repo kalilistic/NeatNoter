@@ -25,6 +25,8 @@ namespace NeatNoter
                 InternalName = "New Note##" + uid,
                 Body = string.Empty,
                 Categories = new List<Category>(),
+                Images = new List<Image>(),
+                Lines = new List<Tuple<Vector2, Vector2, Vector3>>(),
             };
             Notes.Insert(0, note);
             return note;
@@ -39,6 +41,8 @@ namespace NeatNoter
                 InternalName = "New Category##" + uid,
                 Body = "Category description",
                 Color = new Vector3((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble()),
+                Images = new List<Image>(),
+                Lines = new List<Tuple<Vector2, Vector2, Vector3>>(),
             };
             Categories.Insert(0, category);
             return category;

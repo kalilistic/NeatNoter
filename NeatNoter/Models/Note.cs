@@ -6,6 +6,6 @@ namespace NeatNoter.Models
     {
         public ulong AssociatedCharacter { get; set; }
 
-        public List<Category> Categories { get; set; }
+        public IList<Category> Categories { get; set; }
     }
 }

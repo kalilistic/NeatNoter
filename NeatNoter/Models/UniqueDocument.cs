@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -28,6 +30,19 @@ namespace NeatNoter.Models
 
         // ReSharper disable once MemberCanBePrivate.Global
         public string InternalBody { get; set; }
+
+        public IList<Image> Images { get; set; }
+
+        public IList<Tuple<Vector2, Vector2, Vector3>> Lines { get; set; }
+
+        public void AddImage(string b64, Vector2 pos)
+        {
+            Images.Add(new Image
+            {
+                Position = pos,
+                InternalTexture = b64,
+            });
+        }
 
         public void CompressBody()
         {

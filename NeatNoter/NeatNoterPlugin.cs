@@ -1,12 +1,14 @@
 ﻿using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using System;
-using System.Runtime.InteropServices;
-using Dalamud.Game.Internal;
+using System.IO;
+using System.Linq;
+using Lumina.Excel.GeneratedSheets;
+using NeatNoter.Models;
 
 namespace NeatNoter
 {
-    public class NeatNoterPlugin : IDalamudPlugin
+    public class NeatNoterPlugin : IDalamudPlugin, IMapProvider
     {
         private DalamudPluginInterface pluginInterface;
         private NeatNoterConfiguration config;
@@ -24,7 +26,7 @@ namespace NeatNoter
 
             this.notebook = new Notebook(this.config);
 
-            this.ui = new NeatNoterUI(this.notebook, this.config);
+            this.ui = new NeatNoterUI(this.notebook, this.config, this);
             this.pluginInterface.UiBuilder.OnBuildUi += this.ui.Draw;
             
             AddComandHandlers();
@@ -47,6 +49,20 @@ namespace NeatNoter
         private void RemoveCommandHandlers()
         {
             this.pluginInterface.CommandManager.RemoveHandler("/notebook");
+        }
+
+        public MemoryStream GetCurrentMap()
+        {
+            if (!this.pluginInterface.Data.IsDataReady || this.pluginInterface.ClientState.LocalPlayer == null)
+                return new MemoryStream();
+
+            var currentTerritory = this.pluginInterface.ClientState.TerritoryType;
+            var currentMap = this.pluginInterface.Data.GetExcelSheet<Map>()
+                .GetRows()
+                .FirstOrDefault(row => row.TerritoryType == currentTerritory);
+            if (currentMap == null)
+                return new MemoryStream();
+            return this.pluginInterface.Data.GetFile(currentMap.Id).FileStream;
         }
 
         #region IDisposable Support

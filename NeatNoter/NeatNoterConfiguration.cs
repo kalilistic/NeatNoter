@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Dalamud.Configuration;
 using Dalamud.Plugin;
 using NeatNoter.Models;
@@ -37,6 +38,24 @@ namespace NeatNoter
             foreach (var note in Notes)
             {
                 note.DecompressBody();
+            }
+
+            // v1.1 compat
+            foreach (var document in Notes.Cast<UniqueDocument>().Concat(Categories))
+            {
+                if (document.Images == null)
+                {
+                    document.Images = new List<Image>();
+                }
+                if (document.Lines == null)
+                {
+                    document.Lines = new List<Tuple<Vector2, Vector2, Vector3>>();
+                }
+
+                foreach (var image in document.Images)
+                {
+                    image.Initialize(this.pluginInterface.UiBuilder);
+                }
             }
         }
 

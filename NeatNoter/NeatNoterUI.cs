@@ -13,27 +13,33 @@ namespace NeatNoter
         private const int MaxNoteSize = 1024 * 4196; // You can fit the complete works of Shakespeare in 3.5MB, so this is probably fine.
 
         private static readonly uint TextColor = ImGui.GetColorU32(ImGuiCol.Text);
-        
+
         private static float WindowSizeY => ImGui.GetWindowSize().Y;
         private static float ElementSizeX => ImGui.GetWindowSize().X - 16;
 
+        private readonly IMapProvider mapProvider;
         private readonly NeatNoterConfiguration config;
         private readonly Notebook notebook;
         private readonly Timer saveTimer;
 
         private bool categoryWindowVisible;
         private bool deletionWindowVisible;
+        private bool drawing;
+        private bool errorWindowVisible;
         private IList<Category> filteredCategories;
         private Category currentCategory;
         private Note currentNote;
+        private string currentErrorMessage;
         private string searchEntry;
         private UIState lastState;
         private UIState state;
-        
+        private Vector3 currentDrawColor;
+
         public bool IsVisible { get; set; }
 
-        public NeatNoterUI(Notebook notebook, NeatNoterConfiguration config)
+        public NeatNoterUI(Notebook notebook, NeatNoterConfiguration config, IMapProvider mapProvider)
         {
+            this.mapProvider = mapProvider;
             this.config = config;
             this.notebook = notebook;
 
@@ -47,6 +53,8 @@ namespace NeatNoter
             this.filteredCategories = new List<Category>();
             this.state = UIState.NoteIndex;
             this.searchEntry = string.Empty;
+            this.currentErrorMessage = string.Empty;
+            this.currentDrawColor = new Vector3(1.0f, 1.0f, 1.0f);
 
 #if DEBUG
             IsVisible = true;
@@ -60,8 +68,17 @@ namespace NeatNoter
             if (!IsVisible)
                 return;
 
+            var flags = ImGuiWindowFlags.None;
+            if (this.drawing)
+            {
+                flags |= ImGuiWindowFlags.NoMove;
+                DrawPenColorPickerWindow(ref this.currentDrawColor);
+            }
+
+            DrawErrorWindow(this.currentErrorMessage, ref this.errorWindowVisible);
+
             ImGui.SetNextWindowSize(new Vector2(400, 600), ImGuiCond.FirstUseEver);
-            ImGui.Begin("NeatNoter");
+            ImGui.Begin("NeatNoter", flags);
             // ReSharper disable once AssignmentIsFullyDiscarded
             _ = this.state switch
             {
@@ -270,11 +287,11 @@ namespace NeatNoter
                 ImGui.SetTooltip(note.Name);
 
             ImGui.PopStyleColor();
-            
+
             // Adding the text over manually because otherwise the text position is dependent on label length
             ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset - ElementSizeX / 3.92f, index * heightMod + heightOffset + 4), TextColor, buttonLabel);
             ImGui.GetWindowDrawList().AddLine(windowPos + new Vector2(lineOffset, index * heightMod + heightOffset), windowPos + new Vector2(lineOffset, index * heightMod + heightOffset + 25), TextColor);
-            
+
             var contentPreview = note.Body.Replace('\n', ' ');
             var cutBodyLength = Math.Min(note.Body.Length, 400);
             for (var i = 1; i < cutBodyLength && ImGui.CalcTextSize(contentPreview).X > ElementSizeX - lineOffset - 22; i++)
@@ -307,7 +324,7 @@ namespace NeatNoter
                 return;
 
             ImGui.SetNextWindowSize(new Vector2(400, 300));
-            ImGui.Begin("NeatNoter Category Selection", ImGuiWindowFlags.NoResize);
+            ImGui.Begin("NeatNoter Category Selection", ref this.categoryWindowVisible, ImGuiWindowFlags.NoResize);
 
             if (this.notebook.Categories.Count != 0)
             {
@@ -379,6 +396,87 @@ namespace NeatNoter
             SetState(UIState.CategoryEdit);
         }
 
+        /// <summary>
+        /// Called from <see cref="DrawCategoryEditTool"/> and <see cref="DrawNoteEditTool"/>. Draws the text editor.
+        /// </summary>
+        private void DrawDocumentEditor(UniqueDocument document)
+        {
+            var windowPos = ImGui.GetWindowPos();
+
+            var title = document.Name;
+            if (ImGui.InputText(document.GetTypeName() + " Title", ref title, 128))
+            {
+                document.Name = title;
+            }
+
+            var body = document.Body;
+            if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize,
+                new Vector2(ElementSizeX, WindowSizeY - 94), ImGuiInputTextFlags.AllowTabInput))
+            {
+                document.Body = body;
+            }
+
+            if (ImGui.BeginPopupContextItem("Editor Context Menu " + document.InternalName))
+            {
+                if (ImGui.Selectable("Insert current minimap"))
+                {
+                    var mapData = this.mapProvider.GetCurrentMap();
+                    if (mapData.Length == 0)
+                    {
+                        this.currentErrorMessage = "No map is currently loaded!";
+                        this.errorWindowVisible = true;
+                    }
+                    document.Images.Add(new Image
+                    {
+                        Position = Vector2.Zero,
+                        InternalTexture = Convert.ToBase64String(mapData.ToArray()),
+                    });
+                }
+                if (!this.drawing && ImGui.Selectable("Insert drawing"))
+                {
+                    this.drawing = true;
+                }
+                else if (this.drawing && ImGui.Selectable("Stop drawing"))
+                {
+                    this.drawing = false;
+                }
+                ImGui.EndPopup();
+            }
+
+            // Draw images next
+            var toRemove = new List<Image>();
+            foreach (var image in document.Images)
+            {
+                if (string.IsNullOrEmpty(image.InternalTexture))
+                {
+                    toRemove.Add(image);
+                    continue;
+                }
+                ImGui.GetWindowDrawList().AddImage(image.Texture.ImGuiHandle, windowPos + image.Position, windowPos + image.Position + new Vector2(image.Texture.Width, image.Texture.Height));
+            }
+            foreach (var image in toRemove)
+            {
+                document.Images.Remove(image);
+            }
+
+            // Draw pen tool stuff
+            if (this.drawing)
+            {
+                if (ImGui.IsMouseDown(0))
+                {
+                    var delta = ImGui.GetMouseDragDelta(0);
+                    var a = ImGui.GetMousePos() - windowPos - delta;
+                    var b = ImGui.GetMousePos() - windowPos;
+                    document.Lines.Add(Tuple.Create(a, b, this.currentDrawColor));
+                }
+            }
+            foreach (var line in document.Lines)
+            {
+                var (a, b, col) = line;
+                ImGui.GetWindowDrawList().AddLine(windowPos + a, windowPos + b, ImGui.GetColorU32(new Vector4(col, 1.0f)));
+            }
+        }
+
         private void SetState(UIState newState)
         {
             if (newState == this.state)
@@ -388,6 +486,9 @@ namespace NeatNoter
 
             this.deletionWindowVisible = false; // We want to disable these on state changes
             this.categoryWindowVisible = false;
+            this.errorWindowVisible = false;
+
+            this.drawing = false;
 
             this.lastState = this.state;
             this.state = newState;
@@ -422,20 +523,28 @@ namespace NeatNoter
             return ret;
         }
 
-        private static void DrawDocumentEditor(UniqueDocument item)
+        private static void DrawErrorWindow(string message, ref bool visible)
         {
-            var title = item.Name;
-            if (ImGui.InputText(item.GetTypeName() + " Title", ref title, 128))
-            {
-                item.Name = title;
-            }
+            if (!visible)
+                return;
 
-            var body = item.Body;
-            if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize,
-                new Vector2(ElementSizeX, WindowSizeY - 94), ImGuiInputTextFlags.AllowTabInput))
+            ImGui.SetNextWindowSize(new Vector2(250, 81));
+            ImGui.SetNextWindowFocus();
+            ImGui.Begin("NeatNoter Error", ImGuiWindowFlags.NoResize);
+            ImGui.Text(message);
+            if (ImGui.Button("Ok"))
             {
-                item.Body = body;
+                visible = false;
             }
+            ImGui.End();
+        }
+
+        private static void DrawPenColorPickerWindow(ref Vector3 color)
+        {
+            ImGui.SetNextWindowSize(new Vector2(300, 290));
+            ImGui.Begin("NeatNoter Pen Color Picker", ImGuiWindowFlags.NoCollapse);
+            ImGui.ColorPicker3(string.Empty, ref color);
+            ImGui.End();
         }
 
         public void Dispose()
