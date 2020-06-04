@@ -465,6 +465,7 @@ namespace NeatNoter
                 if (ImGui.IsMouseDown(0))
                 {
                     var delta = ImGui.GetMouseDragDelta(0);
+                    ImGui.ResetMouseDragDelta();
                     var a = ImGui.GetMousePos() - windowPos - delta;
                     var b = ImGui.GetMousePos() - windowPos;
                     document.Lines.Add(Tuple.Create(a, b, this.currentDrawColor));
