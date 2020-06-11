@@ -12,8 +12,8 @@ namespace NeatNoter
 {
     internal class Notebook
     {
-        public List<Category> Categories { get; private set; }
-        public List<Note> Notes { get; private set; }
+        public List<Category> Categories { get; set; }
+        public List<Note> Notes { get; set; }
 
         public Notebook(NeatNoterConfiguration config)
         {
@@ -91,7 +91,7 @@ namespace NeatNoter
         public static IEnumerable<Note> FilterByCategories(this IEnumerable<Note> notes, IEnumerable<Category> categories)
             => notes.Where(note => categories.All(category => note.Categories.Contains(category)));
 
-        public static IList<UniqueDocument> Alphabetize(this IEnumerable<UniqueDocument> documents, SortDirection direction)
+        public static List<T> Alphabetize<T>(this IEnumerable<T> documents, SortDirection direction) where T : UniqueDocument
         {
             var docList = documents.ToList();
             docList.Sort((a, b) => direction == SortDirection.Ascending
@@ -99,11 +99,11 @@ namespace NeatNoter
                 : string.Compare(b.Name, a.Name, StringComparison.Ordinal));
             return docList;
         }
+    }
 
-        public enum SortDirection
-        {
-            Ascending,
-            Descending,
-        }
+    public enum SortDirection
+    {
+        Ascending,
+        Descending,
     }
 }

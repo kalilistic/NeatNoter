@@ -76,6 +76,8 @@ namespace NeatNoter
                 DrawPenToolWindow(ref drawColor, ref drawThickness);
                 if (Math.Abs(drawThickness - this.config.PenThickness) > 0.001 || drawColor != this.config.PenColor)
                 {
+                    this.config.PenThickness = drawThickness;
+                    this.config.PenColor = drawColor;
                     this.config.Save();
                 }
             }
@@ -110,21 +112,30 @@ namespace NeatNoter
 
             DrawTabBar();
 
-            if (ImGui.Button("New Note##-1"))
+            if (ImGui.Button("New Note##NeatNoter-1"))
             {
                 this.currentNote = this.notebook.CreateNote();
                 SetState(UIState.NoteEdit);
                 return true;
             }
 
-            /*ImGui.SameLine();
-
-            if (ImGui.Button("Sort##-1"))
+            ImGui.SameLine(ElementSizeX - 24);
+            if (ImGui.Button("Sort##NeatNoter-1"))
             {
-                this.currentNote = this.notebook.CreateNote();
-                SetState(UIState.NoteEdit);
-                return true;
-            }*/
+                ImGui.OpenPopup("Sort Context Menu##NeatNoter");
+            }
+            if (ImGui.BeginPopup("Sort Context Menu##NeatNoter"))
+            {
+                if (ImGui.Selectable("Name (Ascending)"))
+                {
+                    this.notebook.Notes = this.notebook.Notes.Alphabetize(SortDirection.Ascending);
+                }
+                else if (ImGui.Selectable("Name (Descending)"))
+                {
+                    this.notebook.Notes = this.notebook.Notes.Alphabetize(SortDirection.Descending);
+                }
+                ImGui.EndPopup();
+            }
 
             ImGui.Separator();
 
@@ -149,11 +160,29 @@ namespace NeatNoter
 
             DrawTabBar();
 
-            if (ImGui.Button("New Category##-1"))
+            if (ImGui.Button("New Category##NeatNoter-1"))
             {
                 this.currentCategory = this.notebook.CreateCategory();
                 SetState(UIState.CategoryEdit);
                 return true;
+            }
+
+            ImGui.SameLine(ElementSizeX - 24);
+            if (ImGui.Button("Sort##NeatNoter-1"))
+            {
+                ImGui.OpenPopup("Category Sort Context Menu##NeatNoter");
+            }
+            if (ImGui.BeginPopup("Category Sort Context Menu##NeatNoter"))
+            {
+                if (ImGui.Selectable("Name (Ascending)"))
+                {
+                    this.notebook.Categories = this.notebook.Categories.Alphabetize(SortDirection.Ascending);
+                }
+                else if (ImGui.Selectable("Name (Descending)"))
+                {
+                    this.notebook.Categories = this.notebook.Categories.Alphabetize(SortDirection.Descending);
+                }
+                ImGui.EndPopup();
             }
 
             ImGui.Separator();
@@ -310,7 +339,7 @@ namespace NeatNoter
                 contentPreview = note.Body.Replace('\n', ' ').Substring(0, cutBodyLength - i) + "...";
             ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset + 10, index * heightMod + heightOffset + 4), TextColor, contentPreview);
 
-            if (ImGui.BeginPopupContextItem("NeatNoter Note Neater Menu##" + note.IdentifierString))
+            if (ImGui.BeginPopupContextItem("NeatNoter Note Neater Menu##NeatNoter" + note.IdentifierString))
             {
                 if (ImGui.Selectable("Delete"))
                 {
@@ -391,7 +420,7 @@ namespace NeatNoter
 
             ImGui.GetWindowDrawList().AddText(ImGui.GetWindowPos() + new Vector2(ElementSizeX * 0.045f, index * heightMod + heightOffset + 4), TextColor, buttonLabel);
 
-            if (ImGui.BeginPopupContextItem("NeatNoter Category Neater Menu##" + category.IdentifierString))
+            if (ImGui.BeginPopupContextItem("NeatNoter Category Neater Menu##NeatNoter" + category.IdentifierString))
             {
                 if (ImGui.Selectable("Delete"))
                 {
@@ -424,17 +453,12 @@ namespace NeatNoter
             var allowFocus = !(ImGui.IsAnyMouseDown() && !ImGui.IsWindowHovered()); // Drop keyboard focus if the user clicks off the window
             ImGui.PushAllowKeyboardFocus(allowFocus);
             var body = document.Body;
-            if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize,
-                new Vector2(ElementSizeX, WindowSizeY - 94), ImGuiInputTextFlags.AllowTabInput))
+            var inputFlags = ImGuiInputTextFlags.AllowTabInput;
+            if (this.drawing)
+                inputFlags |= ImGuiInputTextFlags.ReadOnly;
+            if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize, new Vector2(ElementSizeX, WindowSizeY - 94), inputFlags))
             {
                 document.Body = body;
-            }
-            var textboxScroll = 0.0f;
-            if (ImGui.IsItemActive())
-            {
-                ImGui.BeginChild("NeatNoter Text Entry Field##-1");
-                textboxScroll = ImGui.GetScrollY();
-                ImGui.EndChild();
             }
             ImGui.PopAllowKeyboardFocus();
 
@@ -492,12 +516,10 @@ namespace NeatNoter
             }
             foreach (var (a, b, col, thickness) in document.Lines)
             {
-                var scrollMod = new Vector2(0, textboxScroll);
+                var lineBegin = windowPos + a;
+                var lineEnd = windowPos + b;
 
-                var lineBegin = windowPos + a - scrollMod;
-                var lineEnd = windowPos + b - scrollMod;
-
-                ImGui.GetWindowDrawList().AddLine(lineBegin,lineEnd, ImGui.GetColorU32(new Vector4(col, 1.0f)), thickness);
+                ImGui.GetWindowDrawList().AddLine(lineBegin, lineEnd, ImGui.GetColorU32(new Vector4(col, 1.0f)), thickness);
             }
         }
 
@@ -565,10 +587,10 @@ namespace NeatNoter
 
         private static void DrawPenToolWindow(ref Vector3 color, ref float thickness)
         {
-            ImGui.SetNextWindowSize(new Vector2(300, 313));
-            ImGui.Begin("NeatNoter Pen Color Picker", ImGuiWindowFlags.NoCollapse);
+            ImGui.SetNextWindowSize(new Vector2(300, 316));
+            ImGui.Begin("NeatNoter Pen Color Picker", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize);
             ImGui.ColorPicker3(string.Empty, ref color);
-            ImGui.InputFloat("Line thickness", ref thickness);
+            ImGui.SliderFloat("Line thickness", ref thickness, 0, 255);
             ImGui.End();
         }
 
