@@ -55,14 +55,14 @@ namespace NeatNoter
         {
             if (!this.pluginInterface.Data.IsDataReady || this.pluginInterface.ClientState.LocalPlayer == null)
                 return new MemoryStream();
-
-            var currentTerritory = this.pluginInterface.ClientState.TerritoryType;
+            PluginLog.Log(this.pluginInterface.ClientState.TerritoryType.ToString());
             var currentMap = this.pluginInterface.Data.GetExcelSheet<Map>()
                 .GetRows()
-                .FirstOrDefault(row => row.TerritoryType == currentTerritory);
+                .FirstOrDefault(row => row.TerritoryType == this.pluginInterface.ClientState.TerritoryType);
             if (currentMap == null)
                 return new MemoryStream();
-            return this.pluginInterface.Data.GetFile(currentMap.Id).FileStream;
+            PluginLog.Log($"ui/map/{currentMap.Id}/{currentMap.Id.Replace("/", "")}_m.tex");
+            return this.pluginInterface.Data.GetFile($"ui/map/{currentMap.Id}/{currentMap.Id.Replace("/", "")}_m.tex").FileStream;
         }
 
         #region IDisposable Support

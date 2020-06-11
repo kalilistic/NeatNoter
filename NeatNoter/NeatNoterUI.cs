@@ -112,6 +112,15 @@ namespace NeatNoter
                 return true;
             }
 
+            /*ImGui.SameLine();
+
+            if (ImGui.Button("Sort##-1"))
+            {
+                this.currentNote = this.notebook.CreateNote();
+                SetState(UIState.NoteEdit);
+                return true;
+            }*/
+
             ImGui.Separator();
 
             for (var i = 0; i < this.notebook.Notes.Count; i++)
@@ -163,7 +172,7 @@ namespace NeatNoter
             ImGui.SameLine();
             if (ImGui.Button(this.categoryWindowVisible ? "Close category selection" : "Choose categories", new Vector2(ElementSizeX - 44, 23)))
                 this.categoryWindowVisible = !this.categoryWindowVisible;
-            IList<Category> categories = this.currentNote.Categories;
+            var categories = this.currentNote.Categories;
             CategorySelectionWindow(ref categories);
             this.currentNote.Categories = categories.ToList();
 
@@ -409,16 +418,19 @@ namespace NeatNoter
                 document.Name = title;
             }
 
+            var allowFocus = !(ImGui.IsAnyMouseDown() && !ImGui.IsWindowHovered()); // Drop keyboard focus if the user clicks off the window
+            ImGui.PushAllowKeyboardFocus(allowFocus);
             var body = document.Body;
             if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize,
                 new Vector2(ElementSizeX, WindowSizeY - 94), ImGuiInputTextFlags.AllowTabInput))
             {
                 document.Body = body;
             }
+            ImGui.PopAllowKeyboardFocus();
 
             if (ImGui.BeginPopupContextItem("Editor Context Menu " + document.InternalName))
             {
-                if (ImGui.Selectable("Insert current minimap"))
+                /*if (ImGui.Selectable("Insert current minimap"))
                 {
                     var mapData = this.mapProvider.GetCurrentMap();
                     if (mapData.Length == 0)
@@ -431,7 +443,7 @@ namespace NeatNoter
                         Position = Vector2.Zero,
                         InternalTexture = Convert.ToBase64String(mapData.ToArray()),
                     });
-                }
+                }*/
                 if (!this.drawing && ImGui.Selectable("Insert drawing"))
                 {
                     this.drawing = true;
@@ -459,22 +471,23 @@ namespace NeatNoter
                 document.Images.Remove(image);
             }
 
-            // Draw pen tool stuff
-            if (this.drawing)
+            // Draw pen tool stuff (TODO add density)
+            if (this.drawing && ImGui.IsMouseDown(0) && ImGui.IsItemHovered())
             {
-                if (ImGui.IsMouseDown(0))
-                {
-                    var delta = ImGui.GetMouseDragDelta(0);
-                    ImGui.ResetMouseDragDelta();
-                    var a = ImGui.GetMousePos() - windowPos - delta;
-                    var b = ImGui.GetMousePos() - windowPos;
-                    document.Lines.Add(Tuple.Create(a, b, this.currentDrawColor));
-                }
+                var delta = ImGui.GetMouseDragDelta(0);
+                ImGui.ResetMouseDragDelta();
+                var a = ImGui.GetMousePos() - windowPos - delta;
+                var b = ImGui.GetMousePos() - windowPos;
+                document.Lines.Add(Tuple.Create(a, b, this.currentDrawColor));
             }
             foreach (var line in document.Lines)
             {
                 var (a, b, col) = line;
-                ImGui.GetWindowDrawList().AddLine(windowPos + a, windowPos + b, ImGui.GetColorU32(new Vector4(col, 1.0f)));
+                
+                var lineBegin = windowPos + a;
+                var lineEnd = windowPos + b;
+
+                ImGui.GetWindowDrawList().AddLine(lineBegin,lineEnd, ImGui.GetColorU32(new Vector4(col, 1.0f)));
             }
         }
 
