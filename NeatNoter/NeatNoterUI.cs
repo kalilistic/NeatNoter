@@ -26,14 +26,13 @@ namespace NeatNoter
         private bool deletionWindowVisible;
         private bool drawing;
         private bool errorWindowVisible;
-        private IList<Category> filteredCategories;
+        private readonly IList<Category> filteredCategories;
         private Category currentCategory;
         private Note currentNote;
         private string currentErrorMessage;
         private string searchEntry;
         private UIState lastState;
         private UIState state;
-        private Vector3 currentDrawColor;
 
         public bool IsVisible { get; set; }
 
@@ -54,7 +53,6 @@ namespace NeatNoter
             this.state = UIState.NoteIndex;
             this.searchEntry = string.Empty;
             this.currentErrorMessage = string.Empty;
-            this.currentDrawColor = new Vector3(1.0f, 1.0f, 1.0f);
 
 #if DEBUG
             IsVisible = true;
@@ -72,7 +70,14 @@ namespace NeatNoter
             if (this.drawing)
             {
                 flags |= ImGuiWindowFlags.NoMove;
-                DrawPenColorPickerWindow(ref this.currentDrawColor);
+
+                var drawThickness = this.config.PenThickness;
+                var drawColor = this.config.PenColor;
+                DrawPenToolWindow(ref drawColor, ref drawThickness);
+                if (Math.Abs(drawThickness - this.config.PenThickness) > 0.001 || drawColor != this.config.PenColor)
+                {
+                    this.config.Save();
+                }
             }
 
             DrawErrorWindow(this.currentErrorMessage, ref this.errorWindowVisible);
@@ -172,9 +177,7 @@ namespace NeatNoter
             ImGui.SameLine();
             if (ImGui.Button(this.categoryWindowVisible ? "Close category selection" : "Choose categories", new Vector2(ElementSizeX - 44, 23)))
                 this.categoryWindowVisible = !this.categoryWindowVisible;
-            var categories = this.currentNote.Categories;
-            CategorySelectionWindow(ref categories);
-            this.currentNote.Categories = categories.ToList();
+            CategorySelectionWindow(this.currentNote.Categories);
 
             DrawDocumentEditor(this.currentNote);
 
@@ -229,7 +232,7 @@ namespace NeatNoter
                 this.categoryWindowVisible = !this.categoryWindowVisible;
             }
 
-            CategorySelectionWindow(ref this.filteredCategories);
+            CategorySelectionWindow(this.filteredCategories);
 
             ImGui.Separator();
 
@@ -327,7 +330,7 @@ namespace NeatNoter
         /// <summary>
         /// Called from <see cref="DrawNoteEditTool"/> and <see cref="DrawSearchTool"/>. Draws the category selection window.
         /// </summary>
-        private void CategorySelectionWindow(ref IList<Category> selectedCategories)
+        private void CategorySelectionWindow(ICollection<Category> selectedCategories)
         {
             if (!this.categoryWindowVisible)
                 return;
@@ -426,6 +429,13 @@ namespace NeatNoter
             {
                 document.Body = body;
             }
+            var textboxScroll = 0.0f;
+            if (ImGui.IsItemActive())
+            {
+                ImGui.BeginChild("NeatNoter Text Entry Field##-1");
+                textboxScroll = ImGui.GetScrollY();
+                ImGui.EndChild();
+            }
             ImGui.PopAllowKeyboardFocus();
 
             if (ImGui.BeginPopupContextItem("Editor Context Menu " + document.InternalName))
@@ -471,23 +481,23 @@ namespace NeatNoter
                 document.Images.Remove(image);
             }
 
-            // Draw pen tool stuff (TODO add density)
+            // Draw pen tool stuff
             if (this.drawing && ImGui.IsMouseDown(0) && ImGui.IsItemHovered())
             {
                 var delta = ImGui.GetMouseDragDelta(0);
                 ImGui.ResetMouseDragDelta();
                 var a = ImGui.GetMousePos() - windowPos - delta;
                 var b = ImGui.GetMousePos() - windowPos;
-                document.Lines.Add(Tuple.Create(a, b, this.currentDrawColor));
+                document.Lines.Add((a, b, this.config.PenColor, this.config.PenThickness));
             }
-            foreach (var line in document.Lines)
+            foreach (var (a, b, col, thickness) in document.Lines)
             {
-                var (a, b, col) = line;
-                
-                var lineBegin = windowPos + a;
-                var lineEnd = windowPos + b;
+                var scrollMod = new Vector2(0, textboxScroll);
 
-                ImGui.GetWindowDrawList().AddLine(lineBegin,lineEnd, ImGui.GetColorU32(new Vector4(col, 1.0f)));
+                var lineBegin = windowPos + a - scrollMod;
+                var lineEnd = windowPos + b - scrollMod;
+
+                ImGui.GetWindowDrawList().AddLine(lineBegin,lineEnd, ImGui.GetColorU32(new Vector4(col, 1.0f)), thickness);
             }
         }
 
@@ -553,11 +563,12 @@ namespace NeatNoter
             ImGui.End();
         }
 
-        private static void DrawPenColorPickerWindow(ref Vector3 color)
+        private static void DrawPenToolWindow(ref Vector3 color, ref float thickness)
         {
-            ImGui.SetNextWindowSize(new Vector2(300, 290));
+            ImGui.SetNextWindowSize(new Vector2(300, 313));
             ImGui.Begin("NeatNoter Pen Color Picker", ImGuiWindowFlags.NoCollapse);
             ImGui.ColorPicker3(string.Empty, ref color);
+            ImGui.InputFloat("Line thickness", ref thickness);
             ImGui.End();
         }
 
