@@ -1,12 +1,13 @@
-﻿using System;
+﻿using NeatNoter.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using NeatNoter.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Windows.Forms;
 
 namespace NeatNoter
 {
@@ -70,17 +71,39 @@ namespace NeatNoter
             return Notes.Where(note => note.Name.Contains(fragment));
         }
 
-        public void CreateBackup(string outputLocation)
+        public void CreateBackup()
         {
+            using var saveFileDialogue = new SaveFileDialog
+            {
+                Filter = "JSON files (*.json)|All files (*.*)",
+                AddExtension = true,
+                AutoUpgradeEnabled = true,
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                RestoreDirectory = true,
+            };
+            if (saveFileDialogue.ShowDialog() != DialogResult.OK)
+                return;
+
             dynamic obj = new ExpandoObject();
             obj.Notes = Notes;
             obj.Categories = Categories;
-            File.WriteAllText(outputLocation, JsonConvert.SerializeObject(obj));
+            File.WriteAllText(saveFileDialogue.FileName, JsonConvert.SerializeObject(obj));
         }
 
-        public void LoadBackup(string inputLocation)
+        public void LoadBackup()
         {
-            var json = JObject.Parse(File.ReadAllText(inputLocation));
+            using var openFileDialog = new OpenFileDialog
+            {
+                Filter = "JSON files (*.json)|All files (*.*)",
+                AddExtension = true,
+                AutoUpgradeEnabled = true,
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                RestoreDirectory = true,
+            };
+            if (openFileDialog.ShowDialog() != DialogResult.OK)
+                return;
+
+            var json = JObject.Parse(File.ReadAllText(openFileDialog.FileName));
             Notes = json["Notes"].ToObject<List<Note>>();
             Categories = json["Categories"].ToObject<List<Category>>();
         }

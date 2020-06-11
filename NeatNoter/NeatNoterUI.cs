@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace NeatNoter
@@ -119,7 +120,7 @@ namespace NeatNoter
                 return true;
             }
 
-            ImGui.SameLine(ElementSizeX - 24);
+            ImGui.SameLine(ElementSizeX - 133);
             if (ImGui.Button("Sort##NeatNoter-1"))
             {
                 ImGui.OpenPopup("Sort Context Menu##NeatNoter");
@@ -135,6 +136,18 @@ namespace NeatNoter
                     this.notebook.Notes = this.notebook.Notes.Alphabetize(SortDirection.Descending);
                 }
                 ImGui.EndPopup();
+            }
+
+            ImGui.SameLine();
+            if (ImGui.Button("Export##NeatNoter-1"))
+            {
+                Task.Run(this.notebook.CreateBackup);
+            }
+
+            ImGui.SameLine();
+            if (ImGui.Button("Import##NeatNoter-1"))
+            {
+                Task.Run(this.notebook.LoadBackup);
             }
 
             ImGui.Separator();
@@ -167,7 +180,7 @@ namespace NeatNoter
                 return true;
             }
 
-            ImGui.SameLine(ElementSizeX - 24);
+            ImGui.SameLine(ElementSizeX - 133);
             if (ImGui.Button("Sort##NeatNoter-1"))
             {
                 ImGui.OpenPopup("Category Sort Context Menu##NeatNoter");
@@ -183,6 +196,18 @@ namespace NeatNoter
                     this.notebook.Categories = this.notebook.Categories.Alphabetize(SortDirection.Descending);
                 }
                 ImGui.EndPopup();
+            }
+
+            ImGui.SameLine();
+            if (ImGui.Button("Export##NeatNoter-1"))
+            {
+                Task.Run(this.notebook.CreateBackup);
+            }
+
+            ImGui.SameLine();
+            if (ImGui.Button("Import##NeatNoter-1"))
+            {
+                Task.Run(this.notebook.LoadBackup);
             }
 
             ImGui.Separator();
