@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeatNoter", "NeatNoter\NeatNoter.csproj", "{528A69A2-52BD-46F0-9137-9C09D50A6A5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeatNoter", "NeatNoter\NeatNoter.csproj", "{528A69A2-52BD-46F0-9137-9C09D50A6A5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -2,15 +2,11 @@
 using NeatNoter.Models;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
-using System.Windows.Forms;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Timer = System.Timers.Timer;
 
 namespace NeatNoter
@@ -150,13 +146,13 @@ namespace NeatNoter
             ImGui.SameLine();
             if (ImGui.Button("Export##NeatNoter-2"))
             {
-                this.notebook.CreateBackup().Start();
+                Task.Run(() => this.notebook.CreateBackup());
             }
 
             ImGui.SameLine();
             if (ImGui.Button("Import##NeatNoter-2"))
             {
-                this.notebook.LoadBackup().Start();
+                Task.Run(() => this.notebook.LoadBackup());
             }
 
             ImGui.Separator();
@@ -210,13 +206,13 @@ namespace NeatNoter
             ImGui.SameLine();
             if (ImGui.Button("Export##NeatNoter-1"))
             {
-                this.notebook.CreateBackup().Start();
+                Task.Run(() => this.notebook.CreateBackup());
             }
 
             ImGui.SameLine();
             if (ImGui.Button("Import##NeatNoter-1"))
             {
-                this.notebook.LoadBackup().Start();
+                Task.Run(() => this.notebook.LoadBackup());
             }
 
             ImGui.Separator();

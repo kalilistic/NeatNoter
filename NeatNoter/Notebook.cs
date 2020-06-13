@@ -7,9 +7,7 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Dalamud.Plugin;
 
 namespace NeatNoter
 {
@@ -73,45 +71,43 @@ namespace NeatNoter
             return Notes.Where(note => note.Name.Contains(fragment));
         }
 
-        public Task CreateBackup()
+        public void CreateBackup()
         {
             using var saveFileDialogue = new SaveFileDialog
             {
-                Filter = "JSON files (*.json)|All files (*.*)",
+                Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
                 AddExtension = true,
                 AutoUpgradeEnabled = true,
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                 RestoreDirectory = true,
+                ShowHelp = true,
             };
-            if (saveFileDialogue.ShowDialog() != DialogResult.OK)
-                return Task.CompletedTask;
+            if (saveFileDialogue.ShowDialog(null) != DialogResult.OK)
+                return;
 
             dynamic obj = new ExpandoObject();
             obj.Notes = Notes;
             obj.Categories = Categories;
             File.WriteAllText(saveFileDialogue.FileName, JsonConvert.SerializeObject(obj));
-
-            return Task.CompletedTask;
         }
 
-        public Task LoadBackup()
+        public void LoadBackup()
         {
             using var openFileDialog = new OpenFileDialog
             {
-                Filter = "JSON files (*.json)|All files (*.*)",
+                Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
                 AddExtension = true,
                 AutoUpgradeEnabled = true,
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                 RestoreDirectory = true,
+                ShowHelp = true,
             };
-            if (openFileDialog.ShowDialog() != DialogResult.OK)
-                return Task.CompletedTask;
+            if (openFileDialog.ShowDialog(null) != DialogResult.OK)
+                return;
 
             var json = JObject.Parse(File.ReadAllText(openFileDialog.FileName));
             Notes = json["Notes"].ToObject<List<Note>>();
             Categories = json["Categories"].ToObject<List<Category>>();
-
-            return Task.CompletedTask;
         }
     }
 
