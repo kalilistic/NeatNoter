@@ -2,10 +2,16 @@
 using NeatNoter.Models;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows.Forms;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Timer = System.Timers.Timer;
 
 namespace NeatNoter
 {
@@ -30,6 +36,7 @@ namespace NeatNoter
         private readonly IList<Category> filteredCategories;
         private Category currentCategory;
         private Note currentNote;
+        private Stack<IEnumerable<(Vector2, Vector2, Vector3, float)>> undoRedo;
         private string currentErrorMessage;
         private string searchEntry;
         private UIState lastState;
@@ -54,6 +61,8 @@ namespace NeatNoter
             this.state = UIState.NoteIndex;
             this.searchEntry = string.Empty;
             this.currentErrorMessage = string.Empty;
+
+            this.undoRedo = new Stack<IEnumerable<(Vector2, Vector2, Vector3, float)>>();
 
 #if DEBUG
             IsVisible = true;
@@ -139,15 +148,15 @@ namespace NeatNoter
             }
 
             ImGui.SameLine();
-            if (ImGui.Button("Export##NeatNoter-1"))
+            if (ImGui.Button("Export##NeatNoter-2"))
             {
-                Task.Run(this.notebook.CreateBackup);
+                this.notebook.CreateBackup().Start();
             }
 
             ImGui.SameLine();
-            if (ImGui.Button("Import##NeatNoter-1"))
+            if (ImGui.Button("Import##NeatNoter-2"))
             {
-                Task.Run(this.notebook.LoadBackup);
+                this.notebook.LoadBackup().Start();
             }
 
             ImGui.Separator();
@@ -201,13 +210,13 @@ namespace NeatNoter
             ImGui.SameLine();
             if (ImGui.Button("Export##NeatNoter-1"))
             {
-                Task.Run(this.notebook.CreateBackup);
+                this.notebook.CreateBackup().Start();
             }
 
             ImGui.SameLine();
             if (ImGui.Button("Import##NeatNoter-1"))
             {
-                Task.Run(this.notebook.LoadBackup);
+                this.notebook.LoadBackup().Start();
             }
 
             ImGui.Separator();
@@ -408,6 +417,8 @@ namespace NeatNoter
                             selectedCategories.Remove(category);
                     }
                     ImGui.PopStyleColor(2);
+                    if (ImGui.IsItemHovered())
+                        ImGui.SetTooltip(category.Body);
                     ImGui.NextColumn();
                 }
             }
@@ -467,7 +478,7 @@ namespace NeatNoter
         /// </summary>
         private void DrawDocumentEditor(UniqueDocument document)
         {
-            var windowPos = ImGui.GetWindowPos();
+            //var windowPos = ImGui.GetWindowPos();
 
             var title = document.Name;
             if (ImGui.InputText(document.GetTypeName() + " Title", ref title, 128))
@@ -487,9 +498,9 @@ namespace NeatNoter
             }
             ImGui.PopAllowKeyboardFocus();
 
-            if (ImGui.BeginPopupContextItem("Editor Context Menu " + document.InternalName))
+            /*if (ImGui.BeginPopupContextItem("Editor Context Menu " + document.InternalName))
             {
-                /*if (ImGui.Selectable("Insert current minimap"))
+                if (ImGui.Selectable("Insert current minimap"))
                 {
                     var mapData = this.mapProvider.GetCurrentMap();
                     if (mapData.Length == 0)
@@ -502,7 +513,7 @@ namespace NeatNoter
                         Position = Vector2.Zero,
                         InternalTexture = Convert.ToBase64String(mapData.ToArray()),
                     });
-                }*/
+                }
                 if (!this.drawing && ImGui.Selectable("Insert drawing"))
                 {
                     this.drawing = true;
@@ -531,13 +542,26 @@ namespace NeatNoter
             }
 
             // Draw pen tool stuff
-            if (this.drawing && ImGui.IsMouseDown(0) && ImGui.IsItemHovered())
+            if (this.drawing && ImGui.IsItemHovered())
             {
-                var delta = ImGui.GetMouseDragDelta(0);
-                ImGui.ResetMouseDragDelta();
-                var a = ImGui.GetMousePos() - windowPos - delta;
-                var b = ImGui.GetMousePos() - windowPos;
-                document.Lines.Add((a, b, this.config.PenColor, this.config.PenThickness));
+                if (ImGui.IsMouseDown(0))
+                {
+                    var delta = ImGui.GetMouseDragDelta(0);
+                    ImGui.ResetMouseDragDelta();
+                    var a = ImGui.GetMousePos() - windowPos - delta;
+                    var b = ImGui.GetMousePos() - windowPos;
+                    document.Lines.Add((a, b, this.config.PenColor, this.config.PenThickness));
+                }
+                else if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Z))) // Undo
+                {
+                    var original = document.Lines;
+                    document.Lines = original.Take(document.Lines.Count - 100).ToList();
+                    this.undoRedo.Push(document.Lines.Except(original));
+                }
+                else if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Y))) // Redo
+                {
+                    document.Lines.AddRange(this.undoRedo.Pop());
+                }
             }
             foreach (var (a, b, col, thickness) in document.Lines)
             {
@@ -545,7 +569,7 @@ namespace NeatNoter
                 var lineEnd = windowPos + b;
 
                 ImGui.GetWindowDrawList().AddLine(lineBegin, lineEnd, ImGui.GetColorU32(new Vector4(col, 1.0f)), thickness);
-            }
+            }*/
         }
 
         private void SetState(UIState newState)

@@ -7,7 +7,9 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using Dalamud.Plugin;
 
 namespace NeatNoter
 {
@@ -71,7 +73,7 @@ namespace NeatNoter
             return Notes.Where(note => note.Name.Contains(fragment));
         }
 
-        public void CreateBackup()
+        public Task CreateBackup()
         {
             using var saveFileDialogue = new SaveFileDialog
             {
@@ -82,15 +84,17 @@ namespace NeatNoter
                 RestoreDirectory = true,
             };
             if (saveFileDialogue.ShowDialog() != DialogResult.OK)
-                return;
+                return Task.CompletedTask;
 
             dynamic obj = new ExpandoObject();
             obj.Notes = Notes;
             obj.Categories = Categories;
             File.WriteAllText(saveFileDialogue.FileName, JsonConvert.SerializeObject(obj));
+
+            return Task.CompletedTask;
         }
 
-        public void LoadBackup()
+        public Task LoadBackup()
         {
             using var openFileDialog = new OpenFileDialog
             {
@@ -101,11 +105,13 @@ namespace NeatNoter
                 RestoreDirectory = true,
             };
             if (openFileDialog.ShowDialog() != DialogResult.OK)
-                return;
+                return Task.CompletedTask;
 
             var json = JObject.Parse(File.ReadAllText(openFileDialog.FileName));
             Notes = json["Notes"].ToObject<List<Note>>();
             Categories = json["Categories"].ToObject<List<Category>>();
+
+            return Task.CompletedTask;
         }
     }
 

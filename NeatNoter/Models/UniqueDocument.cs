@@ -33,7 +33,7 @@ namespace NeatNoter.Models
 
         public IList<Image> Images { get; set; }
 
-        public IList<(Vector2, Vector2, Vector3, float)> Lines { get; set; }
+        public List<(Vector2, Vector2, Vector3, float)> Lines { get; set; }
 
         public void AddImage(string b64, Vector2 pos)
         {
