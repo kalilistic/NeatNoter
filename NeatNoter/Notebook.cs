@@ -7,7 +7,6 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Threading;
 using System.Windows.Forms;
 using Dalamud.Plugin;
 
@@ -15,15 +14,19 @@ namespace NeatNoter
 {
     internal class Notebook
     {
+        private readonly DalamudPluginInterface pluginInterface;
+
         private bool Saving { get; set; }
         public bool Loading { get; private set; }
         public List<Category> Categories { get; set; }
         public List<Note> Notes { get; set; }
 
-        public Notebook(NeatNoterConfiguration config)
+        public Notebook(NeatNoterConfiguration config, DalamudPluginInterface pluginInterface)
         {
             Categories = config.Categories;
             Notes = config.Notes;
+
+            this.pluginInterface = pluginInterface;
         }
 
         public Note CreateNote()
@@ -144,8 +147,12 @@ namespace NeatNoter
             }
 
             var json = JObject.Parse(File.ReadAllText(openFileDialog.FileName));
-            Notes = json["Notes"].ToObject<List<Note>>();
-            Categories = json["Categories"].ToObject<List<Category>>();
+            var importedNotes = json["Notes"].ToObject<List<Note>>();
+            var importedCategories = json["Categories"].ToObject<List<Category>>();
+            importedNotes.InitializeAll(pluginInterface);
+            importedCategories.InitializeAll(pluginInterface);
+            Notes = importedNotes;
+            Categories = importedCategories;
 
             Loading = false;
         }
@@ -163,6 +170,31 @@ namespace NeatNoter
                 ? string.Compare(a.Name, b.Name, StringComparison.Ordinal)
                 : string.Compare(b.Name, a.Name, StringComparison.Ordinal));
             return docList;
+        }
+
+        public static void InitializeAll<T>(this IList<T> list, DalamudPluginInterface pluginInterface) where T : UniqueDocument
+        {
+            if (list == null)
+                throw new ArgumentNullException(nameof(list));
+            foreach (var document in list)
+            {
+                document.DecompressBody();
+
+                // v1.1 compat
+                if (document.Images == null)
+                {
+                    document.Images = new List<Image>();
+                }
+                if (document.Lines == null)
+                {
+                    document.Lines = new List<(Vector2, Vector2, Vector3, float)>();
+                }
+
+                foreach (var image in document.Images)
+                {
+                    image.Initialize(pluginInterface.UiBuilder);
+                }
+            }
         }
     }
 

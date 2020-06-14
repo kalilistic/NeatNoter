@@ -24,7 +24,7 @@ namespace NeatNoter
             this.config = (NeatNoterConfiguration)this.pluginInterface.GetPluginConfig() ?? new NeatNoterConfiguration();
             this.config.Initialize(this.pluginInterface);
 
-            this.notebook = new Notebook(this.config);
+            this.notebook = new Notebook(this.config, this.pluginInterface);
 
             this.ui = new NeatNoterUI(this.notebook, this.config, this);
             this.pluginInterface.UiBuilder.OnBuildUi += this.ui.Draw;
