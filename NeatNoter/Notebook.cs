@@ -19,14 +19,11 @@ namespace NeatNoter
 
         private bool Saving { get; set; }
         public bool Loading { get; private set; }
-        public List<Category> Categories { get; set; }
-        public List<Note> Notes { get; set; }
+        public List<Category> Categories { get => this.config.Categories; set => this.config.Categories = value; }
+        public List<Note> Notes { get => this.config.Notes; set => this.config.Notes = value; }
 
         public Notebook(NeatNoterConfiguration config, DalamudPluginInterface pluginInterface)
         {
-            Categories = config.Categories;
-            Notes = config.Notes;
-
             this.config = config;
             this.pluginInterface = pluginInterface;
         }
