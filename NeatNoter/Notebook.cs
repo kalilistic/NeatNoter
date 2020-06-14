@@ -15,6 +15,7 @@ namespace NeatNoter
     internal class Notebook
     {
         private readonly DalamudPluginInterface pluginInterface;
+        private readonly NeatNoterConfiguration config;
 
         private bool Saving { get; set; }
         public bool Loading { get; private set; }
@@ -26,6 +27,7 @@ namespace NeatNoter
             Categories = config.Categories;
             Notes = config.Notes;
 
+            this.config = config;
             this.pluginInterface = pluginInterface;
         }
 
@@ -158,6 +160,8 @@ namespace NeatNoter
             Categories = importedCategories;
 
             Loading = false;
+
+            this.config.Save();
         }
     }
 
