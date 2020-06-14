@@ -7,12 +7,16 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Threading;
 using System.Windows.Forms;
+using Dalamud.Plugin;
 
 namespace NeatNoter
 {
     internal class Notebook
     {
+        private bool Saving { get; set; }
+        public bool Loading { get; private set; }
         public List<Category> Categories { get; set; }
         public List<Note> Notes { get; set; }
 
@@ -73,6 +77,10 @@ namespace NeatNoter
 
         public void CreateBackup()
         {
+            if (Saving)
+                return;
+            Saving = true;
+
             using var saveFileDialogue = new SaveFileDialog
             {
                 Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
@@ -82,17 +90,35 @@ namespace NeatNoter
                 RestoreDirectory = true,
                 ShowHelp = true,
             };
-            if (saveFileDialogue.ShowDialog(null) != DialogResult.OK)
+            try
+            {
+                if (saveFileDialogue.ShowDialog(null) != DialogResult.OK)
+                {
+                    Saving = false;
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                PluginLog.LogError(e, e.Message);
+                Saving = false;
                 return;
+            }
 
             dynamic obj = new ExpandoObject();
             obj.Notes = Notes;
             obj.Categories = Categories;
             File.WriteAllText(saveFileDialogue.FileName, JsonConvert.SerializeObject(obj));
+
+            Saving = false;
         }
 
         public void LoadBackup()
         {
+            if (Loading)
+                return;
+            Loading = true;
+
             using var openFileDialog = new OpenFileDialog
             {
                 Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
@@ -102,12 +128,26 @@ namespace NeatNoter
                 RestoreDirectory = true,
                 ShowHelp = true,
             };
-            if (openFileDialog.ShowDialog(null) != DialogResult.OK)
+            try
+            {
+                if (openFileDialog.ShowDialog(null) != DialogResult.OK)
+                {
+                    Loading = false;
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                PluginLog.LogError(e, e.Message);
+                Loading = false;
                 return;
+            }
 
             var json = JObject.Parse(File.ReadAllText(openFileDialog.FileName));
             Notes = json["Notes"].ToObject<List<Note>>();
             Categories = json["Categories"].ToObject<List<Category>>();
+
+            Loading = false;
         }
     }
 

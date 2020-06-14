@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Timer = System.Timers.Timer;
@@ -20,6 +19,7 @@ namespace NeatNoter
         private static float WindowSizeY => ImGui.GetWindowSize().Y;
         private static float ElementSizeX => ImGui.GetWindowSize().X - 16;
 
+        private readonly IList<Category> filteredCategories;
         private readonly IMapProvider mapProvider;
         private readonly NeatNoterConfiguration config;
         private readonly Notebook notebook;
@@ -29,7 +29,6 @@ namespace NeatNoter
         private bool deletionWindowVisible;
         private bool drawing;
         private bool errorWindowVisible;
-        private readonly IList<Category> filteredCategories;
         private Category currentCategory;
         private Note currentNote;
         private Stack<IEnumerable<(Vector2, Vector2, Vector3, float)>> undoRedo;
@@ -350,7 +349,7 @@ namespace NeatNoter
             var cutNameLength = Math.Min(note.Name.Length, 70);
             for (var i = 1; i < cutNameLength && ImGui.CalcTextSize(buttonLabel).X > lineOffset - 30; i++)
                 buttonLabel = note.Name.Substring(0, cutNameLength - i) + "...";
-            if (ImGui.Button(note.IdentifierString, new Vector2((int)Math.Truncate(ImGui.GetScrollMaxY()) != 0 ? ElementSizeX - 16 : ElementSizeX, 25)))
+            if (ImGui.Button(note.IdentifierString, new Vector2((int)Math.Truncate(ImGui.GetScrollMaxY()) != 0 ? ElementSizeX - 16 : ElementSizeX, 25)) && !this.notebook.Loading)
             {
                 OpenNote(note);
             }
@@ -367,7 +366,8 @@ namespace NeatNoter
             var cutBodyLength = Math.Min(note.Body.Length, 400);
             for (var i = 1; i < cutBodyLength && ImGui.CalcTextSize(contentPreview).X > ElementSizeX - lineOffset - 22; i++)
                 contentPreview = note.Body.Replace('\n', ' ').Substring(0, cutBodyLength - i) + "...";
-            ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset + 10, index * heightMod + heightOffset + 4), TextColor, contentPreview);
+            ImGui.GetWindowDrawList()
+                .AddText(windowPos + new Vector2(lineOffset + 10, index * heightMod + heightOffset + 4), TextColor, contentPreview);
 
             if (ImGui.BeginPopupContextItem("NeatNoter Note Neater Menu##NeatNoter" + note.IdentifierString))
             {
@@ -441,7 +441,7 @@ namespace NeatNoter
             var cutNameLength = Math.Min(category.Name.Length, 70);
             for (var i = 1; i < cutNameLength && ImGui.CalcTextSize(buttonLabel).X > ElementSizeX - 22; i++)
                 buttonLabel = category.Name.Substring(0, cutNameLength - i) + "...";
-            if (ImGui.Button(category.IdentifierString, new Vector2((int)Math.Truncate(ImGui.GetScrollMaxY()) != 0 ? ElementSizeX - 16 : ElementSizeX, 25)))
+            if (ImGui.Button(category.IdentifierString, new Vector2((int)Math.Truncate(ImGui.GetScrollMaxY()) != 0 ? ElementSizeX - 16 : ElementSizeX, 25)) && !this.notebook.Loading)
             {
                 OpenCategory(category);
             }

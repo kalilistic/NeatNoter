@@ -14,12 +14,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="NeatNoterUI.cs~RF2c086372.TMP" />
-    <None Remove="NeatNoterUI.cs~RF5118594a.TMP" />
-    <None Remove="Notebook.cs~RF4542c13.TMP" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="..\NeatNoter.json" Link="NeatNoter.json" />
   </ItemGroup>
 
