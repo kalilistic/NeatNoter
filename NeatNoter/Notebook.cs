@@ -111,6 +111,9 @@ namespace NeatNoter
             dynamic obj = new ExpandoObject();
             obj.Notes = Notes;
             obj.Categories = Categories;
+            obj.NotesReadable = Notes.ToDictionary(note => note.InternalName, note => note.Body);
+            obj.CategoriesReadable = Categories.ToDictionary(category => category.InternalName, category => category.Body);
+
             File.WriteAllText(saveFileDialogue.FileName, JsonConvert.SerializeObject(obj));
 
             Saving = false;
