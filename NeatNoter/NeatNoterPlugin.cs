@@ -4,7 +4,6 @@ using System;
 using System.IO;
 using System.Linq;
 using Lumina.Excel.GeneratedSheets;
-using NeatNoter.Models;
 
 namespace NeatNoter
 {

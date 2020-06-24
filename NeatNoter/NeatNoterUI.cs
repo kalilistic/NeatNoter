@@ -482,8 +482,6 @@ namespace NeatNoter
                 document.Name = title;
             }
 
-            var allowFocus = !(ImGui.IsAnyMouseDown() && !ImGui.IsWindowHovered()); // Drop keyboard focus if the user clicks off the window
-            ImGui.PushAllowKeyboardFocus(allowFocus);
             var body = document.Body;
             var inputFlags = ImGuiInputTextFlags.AllowTabInput;
             if (this.drawing)
@@ -492,7 +490,6 @@ namespace NeatNoter
             {
                 document.Body = body;
             }
-            ImGui.PopAllowKeyboardFocus();
 
             /*if (ImGui.BeginPopupContextItem("Editor Context Menu " + document.InternalName))
             {
