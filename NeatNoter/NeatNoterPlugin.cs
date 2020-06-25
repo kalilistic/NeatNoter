@@ -21,7 +21,14 @@ namespace NeatNoter
             this.pluginInterface = pluginInterface;
 
             this.config = (NeatNoterConfiguration)this.pluginInterface.GetPluginConfig() ?? new NeatNoterConfiguration();
-            this.config.Initialize(this.pluginInterface);
+            this.config.Initialize(this.pluginInterface, () =>
+            {
+                if (this.config.JustInstalled)
+                {
+                    this.pluginInterface.Framework.Gui.Chat.Print("NoteNoter has been installed! Type /notebook to open the notebook.");
+                    this.config.JustInstalled = false;
+                }
+            });
 
             this.notebook = new Notebook(this.config, this.pluginInterface);
 
