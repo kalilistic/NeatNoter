@@ -36,9 +36,9 @@ namespace NeatNoter
         [JsonIgnore]
         private DalamudPluginInterface pluginInterface;
 
-        public void Initialize(DalamudPluginInterface pluginInterface, Action onPlayerLoad = null)
+        public void Initialize(DalamudPluginInterface pi, Action onPlayerLoad = null)
         {
-            this.pluginInterface = pluginInterface;
+            this.pluginInterface = pi;
 
             Notes.InitializeAll(this.pluginInterface);
             Categories.InitializeAll(this.pluginInterface);
