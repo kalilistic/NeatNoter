@@ -29,6 +29,7 @@ namespace NeatNoter
         private bool deletionWindowVisible;
         private bool drawing;
         private bool errorWindowVisible;
+        private bool minimalView;
         private Category currentCategory;
         private Note currentNote;
         private Stack<IEnumerable<(Vector2, Vector2, Vector3, float)>> undoRedo;
@@ -229,13 +230,18 @@ namespace NeatNoter
         /// </summary>
         private bool DrawNoteEditTool()
         {
-            if (ImGui.Button("Back"))
-                SetState(this.lastState); // We won't have menus more then one-deep, so we don't need to set up a pushdown
+            if (!this.minimalView)
+            {
+                if (ImGui.Button("Back"))
+                    SetState(this
+                        .lastState); // We won't have menus more then one-deep, so we don't need to set up a pushdown
 
-            ImGui.SameLine();
-            if (ImGui.Button(this.categoryWindowVisible ? "Close category selection" : "Choose categories", new Vector2(ElementSizeX - 44, 23)))
-                this.categoryWindowVisible = !this.categoryWindowVisible;
-            CategorySelectionWindow(this.currentNote.Categories);
+                ImGui.SameLine();
+                if (ImGui.Button(this.categoryWindowVisible ? "Close category selection" : "Choose categories",
+                    new Vector2(ElementSizeX - 44, 23)))
+                    this.categoryWindowVisible = !this.categoryWindowVisible;
+                CategorySelectionWindow(this.currentNote.Categories);
+            }
 
             DrawDocumentEditor(this.currentNote);
 
@@ -247,15 +253,18 @@ namespace NeatNoter
         /// </summary>
         private bool DrawCategoryEditTool()
         {
-            if (ImGui.Button("Back"))
-                SetState(this.lastState);
-
-            ImGui.SameLine();
-            var color = this.currentCategory.Color;
-            if (ImGui.ColorEdit3("Color", ref color))
+            if (!this.minimalView)
             {
-                this.currentCategory.Color = color;
-                this.config.Save();
+                if (ImGui.Button("Back"))
+                    SetState(this.lastState);
+
+                ImGui.SameLine();
+                var color = this.currentCategory.Color;
+                if (ImGui.ColorEdit3("Color", ref color))
+                {
+                    this.currentCategory.Color = color;
+                    this.config.Save();
+                }
             }
 
             DrawDocumentEditor(this.currentCategory);
@@ -476,24 +485,27 @@ namespace NeatNoter
         {
             //var windowPos = ImGui.GetWindowPos();
 
-            var title = document.Name;
-            if (ImGui.InputText(document.GetTypeName() + " Title", ref title, 128))
+            if (!this.minimalView)
             {
-                document.Name = title;
+                var title = document.Name;
+                if (ImGui.InputText(document.GetTypeName() + " Title", ref title, 128))
+                {
+                    document.Name = title;
+                }
             }
 
             var body = document.Body;
             var inputFlags = ImGuiInputTextFlags.AllowTabInput;
             if (this.drawing)
                 inputFlags |= ImGuiInputTextFlags.ReadOnly;
-            if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize, new Vector2(ElementSizeX, WindowSizeY - 94), inputFlags))
+            if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize, new Vector2(ElementSizeX, WindowSizeY - (this.minimalView ? 40 : 94)), inputFlags))
             {
                 document.Body = body;
             }
 
-            /*if (ImGui.BeginPopupContextItem("Editor Context Menu " + document.InternalName))
+            if (ImGui.BeginPopupContextItem("Editor Context Menu " + document.InternalName))
             {
-                if (ImGui.Selectable("Insert current minimap"))
+                /*if (ImGui.Selectable("Insert current minimap"))
                 {
                     var mapData = this.mapProvider.GetCurrentMap();
                     if (mapData.Length == 0)
@@ -514,11 +526,19 @@ namespace NeatNoter
                 else if (this.drawing && ImGui.Selectable("Stop drawing"))
                 {
                     this.drawing = false;
+                }*/
+                if (!this.minimalView && ImGui.Selectable("Minimal view"))
+                {
+                    this.minimalView = true;
+                }
+                else if (this.minimalView && ImGui.Selectable("End minimal view"))
+                {
+                    this.minimalView = false;
                 }
                 ImGui.EndPopup();
             }
 
-            // Draw images next
+            /*// Draw images next
             var toRemove = new List<Image>();
             foreach (var image in document.Images)
             {
