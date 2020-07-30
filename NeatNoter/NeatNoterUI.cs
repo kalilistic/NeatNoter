@@ -2,6 +2,7 @@
 using NeatNoter.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -100,6 +101,7 @@ namespace NeatNoter
                 UIState.NoteEdit => DrawNoteEditTool(),
                 UIState.CategoryEdit => DrawCategoryEditTool(),
                 UIState.Search => DrawSearchTool(),
+                UIState.Settings => DrawSettings(),
                 _ => throw new ArgumentOutOfRangeException(),
             };
             ImGui.End();
@@ -316,6 +318,33 @@ namespace NeatNoter
         }
 
         /// <summary>
+        /// Called from <see cref="Draw"/>. Draws the settings.
+        /// </summary>
+        private bool DrawSettings()
+        {
+            var existing = this.config.AutomaticExportPath ?? "";
+            if (ImGui.InputText("Automatic backup path", ref existing, 350000))
+            {
+                this.config.AutomaticExportPath = existing;
+                this.config.Save();
+            }
+
+            if (ImGui.Button("Export##NeatNoter-3"))
+            {
+                Task.Run(() => this.notebook.CreateBackup(true));
+            }
+
+            if (this.notebook.TempExportPath != null)
+            {
+                this.config.AutomaticExportPath = this.notebook.TempExportPath;
+                this.notebook.TempExportPath = null;
+                this.config.Save();
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Used in <see cref="DrawNoteIndex"/>, <see cref="DrawCategoryIndex"/> and <see cref="DrawSearchTool"/>. Draws the tab bar.
         /// </summary>
         private void DrawTabBar()
@@ -335,6 +364,11 @@ namespace NeatNoter
                 if (ImGui.BeginTabItem("Search"))
                 {
                     SetState(UIState.Search);
+                    ImGui.EndTabItem();
+                }
+                if (ImGui.BeginTabItem("Settings"))
+                {
+                    SetState(UIState.Settings);
                     ImGui.EndTabItem();
                 }
                 ImGui.EndTabBar();
@@ -602,7 +636,15 @@ namespace NeatNoter
             this.state = newState;
         }
 
-        private void SaveTimerElapsed(object sender, ElapsedEventArgs e) => this.config.Save();
+        private void SaveTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            this.config.Save();
+
+            if (this.config.AutomaticExportPath != null)
+            {
+                this.notebook.SaveBackup(this.config.AutomaticExportPath);
+            }
+        }
 
         private static bool DrawDeletionConfirmationWindow(ref bool isVisible)
         {
@@ -668,6 +710,7 @@ namespace NeatNoter
             NoteEdit,
             CategoryEdit,
             Search,
+            Settings,
         }
     }
 }

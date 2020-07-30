@@ -19,6 +19,9 @@ namespace NeatNoter
 
         private bool Saving { get; set; }
         public bool Loading { get; private set; }
+
+        public string TempExportPath { get; set; }
+
         public List<Category> Categories { get => this.config.Categories; set => this.config.Categories = value; }
         public List<Note> Notes { get => this.config.Notes; set => this.config.Notes = value; }
 
@@ -77,7 +80,7 @@ namespace NeatNoter
             return Notes.Where(note => note.Name.Contains(fragment));
         }
 
-        public void CreateBackup()
+        public void CreateBackup(bool writeAutomaticPath = false)
         {
             if (Saving)
                 return;
@@ -107,15 +110,25 @@ namespace NeatNoter
                 return;
             }
 
+            SaveBackup(saveFileDialogue.FileName);
+
+            if (writeAutomaticPath)
+            {
+                TempExportPath = saveFileDialogue.FileName;
+            }
+
+            Saving = false;
+        }
+
+        public void SaveBackup(string path)
+        {
             dynamic obj = new ExpandoObject();
             obj.Notes = Notes;
             obj.Categories = Categories;
             obj.NotesReadable = Notes.ToDictionary(note => note.InternalName, note => note.Body);
             obj.CategoriesReadable = Categories.ToDictionary(category => category.InternalName, category => category.Body);
 
-            File.WriteAllText(saveFileDialogue.FileName, JsonConvert.SerializeObject(obj));
-
-            Saving = false;
+            File.WriteAllText(path, JsonConvert.SerializeObject(obj));
         }
 
         public void LoadBackup()

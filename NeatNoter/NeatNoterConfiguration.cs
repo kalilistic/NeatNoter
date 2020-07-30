@@ -22,6 +22,8 @@ namespace NeatNoter
 
         public bool JustInstalled { get; set; }
 
+        public string AutomaticExportPath { get; set; }
+
         public NeatNoterConfiguration()
         {
             Notes = new List<Note>();
