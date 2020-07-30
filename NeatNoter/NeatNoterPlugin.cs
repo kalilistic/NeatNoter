@@ -63,8 +63,7 @@ namespace NeatNoter
                 return new MemoryStream();
             PluginLog.Log(this.pluginInterface.ClientState.TerritoryType.ToString());
             var currentMap = this.pluginInterface.Data.GetExcelSheet<Map>()
-                .GetRows()
-                .FirstOrDefault(row => row.TerritoryType == this.pluginInterface.ClientState.TerritoryType);
+                .FirstOrDefault(row => row.TerritoryType.Value.RowId == this.pluginInterface.ClientState.TerritoryType);
             if (currentMap == null)
                 return new MemoryStream();
             PluginLog.Log($"ui/map/{currentMap.Id}/{currentMap.Id.Replace("/", "")}_m.tex");

@@ -34,6 +34,10 @@
       <HintPath>..\..\Dalamud\Dalamud\bin\Debug\Lumina.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="Lumina.Generated">
+      <HintPath>..\..\Dalamud\Dalamud\bin\Debug\Lumina.Generated.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\Dalamud\Dalamud\bin\Debug\Newtonsoft.Json.dll</HintPath>
