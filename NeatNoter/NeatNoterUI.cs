@@ -322,6 +322,8 @@ namespace NeatNoter
         /// </summary>
         private bool DrawSettings()
         {
+            DrawTabBar();
+
             var existing = this.config.AutomaticExportPath ?? "";
             if (ImGui.InputText("Automatic backup path", ref existing, 350000))
             {
@@ -329,7 +331,7 @@ namespace NeatNoter
                 this.config.Save();
             }
 
-            if (ImGui.Button("Export##NeatNoter-3"))
+            if (ImGui.Button("Set automatic backup location##NeatNoter-2"))
             {
                 Task.Run(() => this.notebook.CreateBackup(true));
             }
