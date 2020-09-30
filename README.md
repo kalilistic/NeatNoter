@@ -11,3 +11,4 @@ A note-taking plugin for Dalamud. Take notes without switching windows or any of
 ![Screenshot](https://raw.githubusercontent.com/karashiiro/NeatNoter/master/Assets/2.png)
 ![Screenshot](https://raw.githubusercontent.com/karashiiro/NeatNoter/master/Assets/3.png)
 ![Screenshot](https://raw.githubusercontent.com/karashiiro/NeatNoter/master/Assets/4.png)
+![Screenshot](https://raw.githubusercontent.com/karashiiro/NeatNoter/master/Assets/5.png)

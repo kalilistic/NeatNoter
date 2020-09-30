@@ -30,7 +30,10 @@ namespace NeatNoter
         private bool deletionWindowVisible;
         private bool drawing;
         private bool errorWindowVisible;
+        private bool backgroundVisible;
         private bool minimalView;
+        private bool transparencyWindowVisible;
+        private float editorTransparency;
         private Category currentCategory;
         private Note currentNote;
         private Stack<IEnumerable<(Vector2, Vector2, Vector3, float)>> undoRedo;
@@ -58,6 +61,13 @@ namespace NeatNoter
             this.state = UIState.NoteIndex;
             this.searchEntry = string.Empty;
             this.currentErrorMessage = string.Empty;
+
+            this.backgroundVisible = true;
+
+            unsafe
+            {
+                this.editorTransparency = ImGui.GetStyleColorVec4(ImGuiCol.FrameBg)->W;
+            }
 
             this.undoRedo = new Stack<IEnumerable<(Vector2, Vector2, Vector3, float)>>();
 
@@ -87,6 +97,12 @@ namespace NeatNoter
                     this.config.PenColor = drawColor;
                     this.config.Save();
                 }
+            }
+
+            if (!this.backgroundVisible)
+            {
+                flags |= ImGuiWindowFlags.NoBackground;
+                flags |= ImGuiWindowFlags.NoTitleBar;
             }
 
             DrawErrorWindow(this.currentErrorMessage, ref this.errorWindowVisible);
@@ -519,7 +535,7 @@ namespace NeatNoter
         /// </summary>
         private void DrawDocumentEditor(UniqueDocument document)
         {
-            //var windowPos = ImGui.GetWindowPos();
+            if (this.transparencyWindowVisible) DrawTransparencySlider(ImGui.GetWindowPos(), ImGui.GetWindowSize());
 
             if (!this.minimalView)
             {
@@ -530,95 +546,79 @@ namespace NeatNoter
                 }
             }
 
+            if (!this.backgroundVisible)
+            {
+                ImGui.Dummy(new Vector2(0, 16.0f));
+            }
+
             var body = document.Body;
             var inputFlags = ImGuiInputTextFlags.AllowTabInput;
             if (this.drawing)
                 inputFlags |= ImGuiInputTextFlags.ReadOnly;
+
+            Vector4 color;
+            unsafe
+            {
+                color = *ImGui.GetStyleColorVec4(ImGuiCol.FrameBg);
+                color.W = this.editorTransparency;
+            }
+            ImGui.PushStyleColor(ImGuiCol.FrameBg, color);
             if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize, new Vector2(ElementSizeX, WindowSizeY - (this.minimalView ? 40 : 94)), inputFlags))
             {
                 document.Body = body;
             }
+            ImGui.PopStyleColor();
 
-            if (ImGui.BeginPopupContextItem("Editor Context Menu " + document.InternalName))
+            if (!ImGui.BeginPopupContextItem("Editor Context Menu " + document.InternalName)) return;
+            if (!this.minimalView && ImGui.Selectable("Minimal view"))
             {
-                /*if (ImGui.Selectable("Insert current minimap"))
-                {
-                    var mapData = this.mapProvider.GetCurrentMap();
-                    if (mapData.Length == 0)
-                    {
-                        this.currentErrorMessage = "No map is currently loaded!";
-                        this.errorWindowVisible = true;
-                    }
-                    document.Images.Add(new Image
-                    {
-                        Position = Vector2.Zero,
-                        InternalTexture = Convert.ToBase64String(mapData.ToArray()),
-                    });
-                }
-                if (!this.drawing && ImGui.Selectable("Insert drawing"))
-                {
-                    this.drawing = true;
-                }
-                else if (this.drawing && ImGui.Selectable("Stop drawing"))
-                {
-                    this.drawing = false;
-                }*/
-                if (!this.minimalView && ImGui.Selectable("Minimal view"))
-                {
-                    this.minimalView = true;
-                }
-                else if (this.minimalView && ImGui.Selectable("End minimal view"))
-                {
-                    this.minimalView = false;
-                }
-                ImGui.EndPopup();
+                this.minimalView = true;
+            }
+            else if (this.minimalView && ImGui.Selectable("End minimal view"))
+            {
+                this.minimalView = false;
             }
 
-            /*// Draw images next
-            var toRemove = new List<Image>();
-            foreach (var image in document.Images)
+            if (this.backgroundVisible && ImGui.Selectable("Hide background"))
             {
-                if (string.IsNullOrEmpty(image.InternalTexture))
-                {
-                    toRemove.Add(image);
-                    continue;
-                }
-                ImGui.GetWindowDrawList().AddImage(image.Texture.ImGuiHandle, windowPos + image.Position, windowPos + image.Position + new Vector2(image.Texture.Width, image.Texture.Height));
+                this.backgroundVisible = false;
             }
-            foreach (var image in toRemove)
+            else if (!this.backgroundVisible && ImGui.Selectable("Show background"))
             {
-                document.Images.Remove(image);
+                this.backgroundVisible = true;
             }
 
-            // Draw pen tool stuff
-            if (this.drawing && ImGui.IsItemHovered())
+            if (!this.transparencyWindowVisible && ImGui.Selectable("Show editor transparency slider"))
             {
-                if (ImGui.IsMouseDown(0))
-                {
-                    var delta = ImGui.GetMouseDragDelta(0);
-                    ImGui.ResetMouseDragDelta();
-                    var a = ImGui.GetMousePos() - windowPos - delta;
-                    var b = ImGui.GetMousePos() - windowPos;
-                    document.Lines.Add((a, b, this.config.PenColor, this.config.PenThickness));
-                }
-                else if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Z))) // Undo
-                {
-                    var original = document.Lines;
-                    document.Lines = original.Take(document.Lines.Count - 100).ToList();
-                    this.undoRedo.Push(document.Lines.Except(original));
-                }
-                else if (ImGui.GetIO().KeyCtrl && ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Y))) // Redo
-                {
-                    document.Lines.AddRange(this.undoRedo.Pop());
-                }
+                this.transparencyWindowVisible = true;
             }
-            foreach (var (a, b, col, thickness) in document.Lines)
+            else if (this.transparencyWindowVisible && ImGui.Selectable("Hide editor transparency slider"))
             {
-                var lineBegin = windowPos + a;
-                var lineEnd = windowPos + b;
+                this.transparencyWindowVisible = false;
+            }
+            ImGui.EndPopup();
+        }
 
-                ImGui.GetWindowDrawList().AddLine(lineBegin, lineEnd, ImGui.GetColorU32(new Vector4(col, 1.0f)), thickness);
-            }*/
+        private void DrawTransparencySlider(Vector2 mainWinPos, Vector2 mainWinSize)
+        {
+            var flags = ImGuiWindowFlags.AlwaysAutoResize;
+            if (!this.backgroundVisible)
+            {
+                flags |= ImGuiWindowFlags.NoBackground;
+                flags |= ImGuiWindowFlags.NoTitleBar;
+            }
+
+            ImGui.SetNextWindowPos(mainWinPos + new Vector2(0, mainWinSize.Y + 8), ImGuiCond.Always);
+            ImGui.Begin("Transparency Slider##51454623463", flags);
+            {
+                var label = "##51454623464";
+                if (!this.backgroundVisible)
+                {
+                    label = "Transparency Slider" + label;
+                }
+                ImGui.DragFloat(label, ref this.editorTransparency, 0.01f, 0, 1);
+            }
+            ImGui.End();
         }
 
         private void SetState(UIState newState)
@@ -631,6 +631,7 @@ namespace NeatNoter
             this.deletionWindowVisible = false; // We want to disable these on state changes
             this.categoryWindowVisible = false;
             this.errorWindowVisible = false;
+            this.backgroundVisible = true;
 
             this.drawing = false;
 
