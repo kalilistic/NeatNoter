@@ -21,7 +21,6 @@ namespace NeatNoter
         private static float ElementSizeX => ImGui.GetWindowSize().X - 16;
 
         private readonly IList<Category> filteredCategories;
-        private readonly IMapProvider mapProvider;
         private readonly NeatNoterConfiguration config;
         private readonly Notebook notebook;
         private readonly Timer saveTimer;
@@ -44,9 +43,8 @@ namespace NeatNoter
 
         public bool IsVisible { get; set; }
 
-        public NeatNoterUI(Notebook notebook, NeatNoterConfiguration config, IMapProvider mapProvider)
+        public NeatNoterUI(Notebook notebook, NeatNoterConfiguration config)
         {
-            this.mapProvider = mapProvider;
             this.config = config;
             this.notebook = notebook;
 

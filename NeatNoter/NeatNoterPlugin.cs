@@ -3,11 +3,10 @@ using Dalamud.Plugin;
 using System;
 using System.IO;
 using System.Linq;
-using Lumina.Excel.GeneratedSheets;
 
 namespace NeatNoter
 {
-    public class NeatNoterPlugin : IDalamudPlugin, IMapProvider
+    public class NeatNoterPlugin : IDalamudPlugin
     {
         private DalamudPluginInterface pluginInterface;
         private NeatNoterConfiguration config;
@@ -32,7 +31,7 @@ namespace NeatNoter
 
             this.notebook = new Notebook(this.config, this.pluginInterface);
 
-            this.ui = new NeatNoterUI(this.notebook, this.config, this);
+            this.ui = new NeatNoterUI(this.notebook, this.config);
             this.pluginInterface.UiBuilder.OnBuildUi += this.ui.Draw;
             
             AddComandHandlers();
@@ -55,19 +54,6 @@ namespace NeatNoter
         private void RemoveCommandHandlers()
         {
             this.pluginInterface.CommandManager.RemoveHandler("/notebook");
-        }
-
-        public MemoryStream GetCurrentMap()
-        {
-            if (!this.pluginInterface.Data.IsDataReady || this.pluginInterface.ClientState.LocalPlayer == null)
-                return new MemoryStream();
-            PluginLog.Log(this.pluginInterface.ClientState.TerritoryType.ToString());
-            var currentMap = this.pluginInterface.Data.GetExcelSheet<Map>()
-                .FirstOrDefault(row => row.TerritoryType.Value.RowId == this.pluginInterface.ClientState.TerritoryType);
-            if (currentMap == null)
-                return new MemoryStream();
-            PluginLog.Log($"ui/map/{currentMap.Id}/{currentMap.Id.Replace("/", "")}_m.tex");
-            return this.pluginInterface.Data.GetFile($"ui/map/{currentMap.Id}/{currentMap.Id.Replace("/", "")}_m.tex").FileStream;
         }
 
         #region IDisposable Support
