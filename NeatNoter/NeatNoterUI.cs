@@ -20,6 +20,7 @@ namespace NeatNoter
         private static float WindowSizeY => ImGui.GetWindowSize().Y;
         private static float ElementSizeX => ImGui.GetWindowSize().X - 16;
 
+        private readonly IList<UniqueDocument> stickyNotes;
         private readonly IList<Category> filteredCategories;
         private readonly NeatNoterConfiguration config;
         private readonly Notebook notebook;
@@ -55,6 +56,7 @@ namespace NeatNoter
             };
             this.saveTimer.Elapsed += SaveTimerElapsed;
 
+            this.stickyNotes = new List<UniqueDocument>();
             this.filteredCategories = new List<Category>();
             this.state = UIState.NoteIndex;
             this.searchEntry = string.Empty;
@@ -104,6 +106,19 @@ namespace NeatNoter
             }
 
             DrawErrorWindow(this.currentErrorMessage, ref this.errorWindowVisible);
+
+            var notesToRemove = new List<UniqueDocument>();
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var stickyNote in this.stickyNotes)
+            {
+                var keep = DrawStickyNote(stickyNote);
+                if (!keep)
+                {
+                    notesToRemove.Add(stickyNote);
+                }
+            }
+            foreach (var note in notesToRemove)
+                this.stickyNotes.Remove(note);
 
             ImGui.SetNextWindowSize(new Vector2(400, 600), ImGuiCond.FirstUseEver);
             ImGui.Begin("NeatNoter", flags);
@@ -430,6 +445,10 @@ namespace NeatNoter
 
             if (ImGui.BeginPopupContextItem("NeatNoter Note Neater Menu##NeatNoter" + note.IdentifierString))
             {
+                if (ImGui.Selectable("Open as Sticky Note"))
+                {
+                    this.stickyNotes.Add(note);
+                }
                 if (ImGui.Selectable("Delete"))
                 {
                     this.currentNote = note;
@@ -529,6 +548,54 @@ namespace NeatNoter
         }
 
         /// <summary>
+        /// Draws a sticky note, a separate note from the normally-active one.
+        /// </summary>
+        private bool DrawStickyNote(UniqueDocument document)
+        {
+            var ret = true;
+
+            ImGui.SetNextWindowSize(new Vector2(400, 600), ImGuiCond.FirstUseEver);
+            ImGui.Begin($"NeatNoterStickyNote##{document.IdentifierString}", ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoTitleBar);
+            {
+                ImGui.Dummy(new Vector2(0, 16.0f));
+
+                var body = document.Body;
+                var inputFlags = ImGuiInputTextFlags.AllowTabInput;
+                if (this.drawing)
+                    inputFlags |= ImGuiInputTextFlags.ReadOnly;
+
+                Vector4 color;
+                unsafe
+                {
+                    color = *ImGui.GetStyleColorVec4(ImGuiCol.FrameBg);
+                    color.W = this.editorTransparency;
+                }
+
+                ImGui.PushStyleColor(ImGuiCol.FrameBg, color);
+                if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize,
+                    new Vector2(ElementSizeX, WindowSizeY - (this.minimalView ? 40 : 94)), inputFlags))
+                {
+                    document.Body = body;
+                }
+
+                ImGui.PopStyleColor();
+
+                if (ImGui.BeginPopupContextItem("Editor Context Menu " + document.InternalName))
+                {
+                    if (ImGui.Selectable("Unpin"))
+                    {
+                        ret = false;
+                    }
+
+                    ImGui.EndPopup();
+                }
+            }
+            ImGui.End();
+
+            return ret;
+        }
+
+        /// <summary>
         /// Called from <see cref="DrawCategoryEditTool"/> and <see cref="DrawNoteEditTool"/>. Draws the text editor.
         /// </summary>
         private void DrawDocumentEditor(UniqueDocument document)
@@ -567,34 +634,37 @@ namespace NeatNoter
             }
             ImGui.PopStyleColor();
 
-            if (!ImGui.BeginPopupContextItem("Editor Context Menu " + document.InternalName)) return;
-            if (!this.minimalView && ImGui.Selectable("Minimal view"))
+            if (ImGui.BeginPopupContextItem("Editor Context Menu " + document.InternalName))
             {
-                this.minimalView = true;
-            }
-            else if (this.minimalView && ImGui.Selectable("End minimal view"))
-            {
-                this.minimalView = false;
-            }
+                if (!this.minimalView && ImGui.Selectable("Minimal view"))
+                {
+                    this.minimalView = true;
+                }
+                else if (this.minimalView && ImGui.Selectable("End minimal view"))
+                {
+                    this.minimalView = false;
+                }
 
-            if (this.backgroundVisible && ImGui.Selectable("Hide background"))
-            {
-                this.backgroundVisible = false;
-            }
-            else if (!this.backgroundVisible && ImGui.Selectable("Show background"))
-            {
-                this.backgroundVisible = true;
-            }
+                if (this.backgroundVisible && ImGui.Selectable("Hide background"))
+                {
+                    this.backgroundVisible = false;
+                }
+                else if (!this.backgroundVisible && ImGui.Selectable("Show background"))
+                {
+                    this.backgroundVisible = true;
+                }
 
-            if (!this.transparencyWindowVisible && ImGui.Selectable("Show editor transparency slider"))
-            {
-                this.transparencyWindowVisible = true;
+                if (!this.transparencyWindowVisible && ImGui.Selectable("Show editor transparency slider"))
+                {
+                    this.transparencyWindowVisible = true;
+                }
+                else if (this.transparencyWindowVisible && ImGui.Selectable("Hide editor transparency slider"))
+                {
+                    this.transparencyWindowVisible = false;
+                }
+
+                ImGui.EndPopup();
             }
-            else if (this.transparencyWindowVisible && ImGui.Selectable("Hide editor transparency slider"))
-            {
-                this.transparencyWindowVisible = false;
-            }
-            ImGui.EndPopup();
         }
 
         private void DrawTransparencySlider(Vector2 mainWinPos, Vector2 mainWinSize)
