@@ -56,9 +56,10 @@ namespace NeatNoter
             {
                 while (true)
                 {
-                    if (this.pluginInterface.ClientState.LocalPlayer != null)
+                    if (this.pluginInterface.ClientState.LocalContentId != 0)
                     {
                         fn();
+                        break;
                     }
                     await Task.Delay(1000);
                 }
