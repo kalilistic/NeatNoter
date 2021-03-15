@@ -17,8 +17,8 @@ namespace NeatNoter
 
         private static readonly uint TextColor = ImGui.GetColorU32(ImGuiCol.Text);
 
-        private static float WindowSizeY => ImGui.GetWindowSize().Y;
-        private static float ElementSizeX => ImGui.GetWindowSize().X - 16;
+        private static float WindowSizeY => ImGui.GetWindowSize().Y * ImGui.GetIO().FontGlobalScale;
+        private static float ElementSizeX => (ImGui.GetWindowSize().X - 16) * ImGui.GetIO().FontGlobalScale;
 
         private readonly IList<Category> filteredCategories;
         private readonly NeatNoterConfiguration config;
@@ -105,7 +105,7 @@ namespace NeatNoter
 
             DrawErrorWindow(this.currentErrorMessage, ref this.errorWindowVisible);
 
-            ImGui.SetNextWindowSize(new Vector2(400, 600), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Vector2(400, 600) * ImGui.GetIO().FontGlobalScale, ImGuiCond.FirstUseEver);
             ImGui.Begin("NeatNoter", flags);
             // ReSharper disable once AssignmentIsFullyDiscarded
             _ = this.state switch
@@ -141,7 +141,7 @@ namespace NeatNoter
                 return true;
             }
 
-            ImGui.SameLine(ElementSizeX - 133);
+            ImGui.SameLine((ElementSizeX - 133) * ImGui.GetIO().FontGlobalScale);
             if (ImGui.Button("Sort##NeatNoter-1"))
             {
                 ImGui.OpenPopup("Sort Context Menu##NeatNoter");
@@ -175,7 +175,7 @@ namespace NeatNoter
 
             for (var i = 0; i < this.notebook.Notes.Count; i++)
             {
-                DrawNoteEntry(this.notebook.Notes[i], i, 89);
+                DrawNoteEntry(this.notebook.Notes[i], i, 89 * ImGui.GetIO().FontGlobalScale);
             }
 
             return true;
@@ -201,7 +201,7 @@ namespace NeatNoter
                 return true;
             }
 
-            ImGui.SameLine(ElementSizeX - 133);
+            ImGui.SameLine((ElementSizeX - 133) * ImGui.GetIO().FontGlobalScale);
             if (ImGui.Button("Sort##NeatNoter-1"))
             {
                 ImGui.OpenPopup("Category Sort Context Menu##NeatNoter");
@@ -235,7 +235,7 @@ namespace NeatNoter
 
             for (var i = 0; i < this.notebook.Categories.Count; i++)
             {
-                DrawCategoryEntry(this.notebook.Categories[i], i, 89);
+                DrawCategoryEntry(this.notebook.Categories[i], i, 89 * ImGui.GetIO().FontGlobalScale);
             }
 
             return true;
@@ -254,7 +254,7 @@ namespace NeatNoter
 
                 ImGui.SameLine();
                 if (ImGui.Button(this.categoryWindowVisible ? "Close category selection" : "Choose categories",
-                    new Vector2(ElementSizeX - 44, 23)))
+                    new Vector2(ElementSizeX - 44, 23) * ImGui.GetIO().FontGlobalScale))
                     this.categoryWindowVisible = !this.categoryWindowVisible;
                 CategorySelectionWindow(this.currentNote.Categories);
             }
@@ -325,7 +325,7 @@ namespace NeatNoter
                 .ToList();
             for (var i = 0; i < results.Count; i++)
             {
-                DrawNoteEntry(results[i], i, 116);
+                DrawNoteEntry(results[i], i, 116 * ImGui.GetIO().FontGlobalScale);
             }
 
             return true;
@@ -393,10 +393,10 @@ namespace NeatNoter
 
         private void DrawNoteEntry(Note note, int index, float heightOffset)
         {
-            const int heightMod = 29;
-            heightOffset -= ImGui.GetScrollY();
+            var heightMod = 29 * ImGui.GetIO().FontGlobalScale;
+            heightOffset -= ImGui.GetScrollY() * ImGui.GetIO().FontGlobalScale;
 
-            var lineOffset = ElementSizeX * 0.3f;
+            var lineOffset = ElementSizeX * 0.3f * ImGui.GetIO().FontGlobalScale;
             var windowPos = ImGui.GetWindowPos();
 
             var color = note.Categories.Count > 0
@@ -408,7 +408,7 @@ namespace NeatNoter
             var cutNameLength = Math.Min(note.Name.Length, 70);
             for (var i = 1; i < cutNameLength && ImGui.CalcTextSize(buttonLabel).X > lineOffset - 30; i++)
                 buttonLabel = note.Name.Substring(0, cutNameLength - i) + "...";
-            if (ImGui.Button(note.IdentifierString, new Vector2((int)Math.Truncate(ImGui.GetScrollMaxY()) != 0 ? ElementSizeX - 16 : ElementSizeX, 25)) && !this.notebook.Loading)
+            if (ImGui.Button(note.IdentifierString, new Vector2((int)Math.Truncate(ImGui.GetScrollMaxY()) != 0 ? ElementSizeX - 16 : ElementSizeX, 25) * ImGui.GetIO().FontGlobalScale) && !this.notebook.Loading)
             {
                 OpenNote(note);
             }
@@ -418,15 +418,15 @@ namespace NeatNoter
             ImGui.PopStyleColor();
 
             // Adding the text over manually because otherwise the text position is dependent on label length
-            ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset - ElementSizeX / 3.92f, index * heightMod + heightOffset + 4), TextColor, buttonLabel);
-            ImGui.GetWindowDrawList().AddLine(windowPos + new Vector2(lineOffset, index * heightMod + heightOffset), windowPos + new Vector2(lineOffset, index * heightMod + heightOffset + 25), TextColor);
+            ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset - ElementSizeX / 3.92f, index * heightMod + heightOffset + 4) * ImGui.GetIO().FontGlobalScale, TextColor, buttonLabel);
+            ImGui.GetWindowDrawList().AddLine(windowPos + new Vector2(lineOffset, index * heightMod + heightOffset) * ImGui.GetIO().FontGlobalScale, windowPos + new Vector2(lineOffset, index * heightMod + heightOffset + 25) * ImGui.GetIO().FontGlobalScale, TextColor);
 
             var contentPreview = note.Body.Replace('\n', ' ');
             var cutBodyLength = Math.Min(note.Body.Length, 400);
             for (var i = 1; i < cutBodyLength && ImGui.CalcTextSize(contentPreview).X > ElementSizeX - lineOffset - 22; i++)
                 contentPreview = note.Body.Replace('\n', ' ').Substring(0, cutBodyLength - i) + "...";
             ImGui.GetWindowDrawList()
-                .AddText(windowPos + new Vector2(lineOffset + 10, index * heightMod + heightOffset + 4), TextColor, contentPreview);
+                .AddText(windowPos + new Vector2(lineOffset + 10, index * heightMod + heightOffset + 4) * ImGui.GetIO().FontGlobalScale, TextColor, contentPreview);
 
             if (ImGui.BeginPopupContextItem("NeatNoter Note Neater Menu##NeatNoter" + note.IdentifierString))
             {
@@ -453,7 +453,7 @@ namespace NeatNoter
             if (!this.categoryWindowVisible)
                 return;
 
-            ImGui.SetNextWindowSize(new Vector2(400, 300));
+            ImGui.SetNextWindowSize(new Vector2(400, 300) * ImGui.GetIO().FontGlobalScale);
             ImGui.Begin("NeatNoter Category Selection", ref this.categoryWindowVisible, ImGuiWindowFlags.NoResize);
 
             if (this.notebook.Categories.Count != 0)
@@ -490,7 +490,7 @@ namespace NeatNoter
         /// </summary>
         private void DrawCategoryEntry(Category category, int index, float heightOffset)
         {
-            const int heightMod = 29;
+            var heightMod = 29 * ImGui.GetIO().FontGlobalScale;
             heightOffset -= ImGui.GetScrollY();
 
             var color = new Vector4(category.Color, 0.5f);
@@ -500,7 +500,7 @@ namespace NeatNoter
             var cutNameLength = Math.Min(category.Name.Length, 70);
             for (var i = 1; i < cutNameLength && ImGui.CalcTextSize(buttonLabel).X > ElementSizeX - 22; i++)
                 buttonLabel = category.Name.Substring(0, cutNameLength - i) + "...";
-            if (ImGui.Button(category.IdentifierString, new Vector2((int)Math.Truncate(ImGui.GetScrollMaxY()) != 0 ? ElementSizeX - 16 : ElementSizeX, 25)) && !this.notebook.Loading)
+            if (ImGui.Button(category.IdentifierString, new Vector2((int)Math.Truncate(ImGui.GetScrollMaxY()) != 0 ? ElementSizeX - 16 : ElementSizeX, 25) * ImGui.GetIO().FontGlobalScale) && !this.notebook.Loading)
             {
                 OpenCategory(category);
             }
@@ -509,7 +509,7 @@ namespace NeatNoter
 
             ImGui.PopStyleColor();
 
-            ImGui.GetWindowDrawList().AddText(ImGui.GetWindowPos() + new Vector2(ElementSizeX * 0.045f, index * heightMod + heightOffset + 4), TextColor, buttonLabel);
+            ImGui.GetWindowDrawList().AddText(ImGui.GetWindowPos() + new Vector2(ElementSizeX * 0.045f, index * heightMod + heightOffset + 4) * ImGui.GetIO().FontGlobalScale, TextColor, buttonLabel);
 
             if (ImGui.BeginPopupContextItem("NeatNoter Category Neater Menu##NeatNoter" + category.IdentifierString))
             {
@@ -546,7 +546,7 @@ namespace NeatNoter
 
             if (!this.backgroundVisible)
             {
-                ImGui.Dummy(new Vector2(0, 16.0f));
+                ImGui.Dummy(new Vector2(0, 16.0f) * ImGui.GetIO().FontGlobalScale);
             }
 
             var body = document.Body;
@@ -561,7 +561,7 @@ namespace NeatNoter
                 color.W = this.editorTransparency;
             }
             ImGui.PushStyleColor(ImGuiCol.FrameBg, color);
-            if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize, new Vector2(ElementSizeX, WindowSizeY - (this.minimalView ? 40 : 94)), inputFlags))
+            if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize, new Vector2(ElementSizeX, WindowSizeY - (this.minimalView ? 40 : 94) * ImGui.GetIO().FontGlobalScale), inputFlags))
             {
                 document.Body = body;
             }
@@ -606,7 +606,7 @@ namespace NeatNoter
                 flags |= ImGuiWindowFlags.NoTitleBar;
             }
 
-            ImGui.SetNextWindowPos(mainWinPos + new Vector2(0, mainWinSize.Y + 8), ImGuiCond.Always);
+            ImGui.SetNextWindowPos(mainWinPos + new Vector2(0, mainWinSize.Y + 8) * ImGui.GetIO().FontGlobalScale, ImGuiCond.Always);
             ImGui.Begin("Transparency Slider##51454623463", flags);
             {
                 var label = "##51454623464";
@@ -679,7 +679,7 @@ namespace NeatNoter
             if (!visible)
                 return;
 
-            ImGui.SetNextWindowSize(new Vector2(250, 81));
+            ImGui.SetNextWindowSize(new Vector2(250, 81) * ImGui.GetIO().FontGlobalScale);
             ImGui.SetNextWindowFocus();
             ImGui.Begin("NeatNoter Error", ImGuiWindowFlags.NoResize);
             ImGui.Text(message);
@@ -692,7 +692,7 @@ namespace NeatNoter
 
         private static void DrawPenToolWindow(ref Vector3 color, ref float thickness)
         {
-            ImGui.SetNextWindowSize(new Vector2(300, 316));
+            ImGui.SetNextWindowSize(new Vector2(300, 316) * ImGui.GetIO().FontGlobalScale);
             ImGui.Begin("NeatNoter Pen Color Picker", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize);
             ImGui.ColorPicker3(string.Empty, ref color);
             ImGui.SliderFloat("Line thickness", ref thickness, 0, 255);
