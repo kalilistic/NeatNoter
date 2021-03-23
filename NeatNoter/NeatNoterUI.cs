@@ -18,7 +18,7 @@ namespace NeatNoter
 
         private static float InverseFontScale => 1 / ImGui.GetIO().FontGlobalScale;
         private static float WindowSizeY => ImGui.GetWindowSize().Y * ImGui.GetIO().FontGlobalScale;
-        private static float ElementSizeX => (ImGui.GetWindowSize().X - 16 * InverseFontScale) * InverseFontScale;
+        private static float ElementSizeX => ImGui.GetWindowSize().X - 16 * InverseFontScale;
 
         private readonly IList<Category> filteredCategories;
         private readonly NeatNoterConfiguration config;
@@ -409,7 +409,7 @@ namespace NeatNoter
             var cutNameLength = Math.Min(note.Name.Length, 70);
             for (var i = 1; i < cutNameLength && ImGui.CalcTextSize(buttonLabel).X > lineOffset - 30 * fontScale; i++)
                 buttonLabel = note.Name.Substring(0, cutNameLength - i) + "...";
-            if (ImGui.Button(note.IdentifierString, new Vector2((int)Math.Truncate(ImGui.GetScrollMaxY()) != 0 ? ElementSizeX - 16 * fontScale : ElementSizeX, 25 * fontScale)) && !this.notebook.Loading)
+            if (ImGui.Button(note.IdentifierString, new Vector2(ElementSizeX - 16 * fontScale, 25 * fontScale)) && !this.notebook.Loading)
             {
                 OpenNote(note);
             }
@@ -502,7 +502,7 @@ namespace NeatNoter
             var cutNameLength = Math.Min(category.Name.Length, 70);
             for (var i = 1; i < cutNameLength && ImGui.CalcTextSize(buttonLabel).X > ElementSizeX - 22; i++)
                 buttonLabel = category.Name.Substring(0, cutNameLength - i) + "...";
-            if (ImGui.Button(category.IdentifierString, new Vector2((int)Math.Truncate(ImGui.GetScrollMaxY()) != 0 ? ElementSizeX - 16 * fontScale : ElementSizeX, 25 * fontScale)) && !this.notebook.Loading)
+            if (ImGui.Button(category.IdentifierString, new Vector2(ElementSizeX - 16 * fontScale, 25 * fontScale)) && !this.notebook.Loading)
             {
                 OpenCategory(category);
             }
