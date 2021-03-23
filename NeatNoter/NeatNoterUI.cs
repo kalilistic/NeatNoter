@@ -141,7 +141,9 @@ namespace NeatNoter
                 return true;
             }
 
-            ImGui.SameLine(ElementSizeX - 133);
+            var fontScale = ImGui.GetIO().FontGlobalScale;
+
+            ImGui.SameLine(ElementSizeX - 133 * fontScale);
             if (ImGui.Button("Sort##NeatNoter-1"))
             {
                 ImGui.OpenPopup("Sort Context Menu##NeatNoter");
@@ -175,7 +177,7 @@ namespace NeatNoter
 
             for (var i = 0; i < this.notebook.Notes.Count; i++)
             {
-                DrawNoteEntry(this.notebook.Notes[i], i, 38 + 51 * ImGui.GetIO().FontGlobalScale);
+                DrawNoteEntry(this.notebook.Notes[i], i, 38 + 51 * fontScale);
             }
 
             return true;
@@ -201,7 +203,9 @@ namespace NeatNoter
                 return true;
             }
 
-            ImGui.SameLine(ElementSizeX - 133);
+            var fontScale = ImGui.GetIO().FontGlobalScale;
+
+            ImGui.SameLine(ElementSizeX - 133 * fontScale);
             if (ImGui.Button("Sort##NeatNoter-1"))
             {
                 ImGui.OpenPopup("Category Sort Context Menu##NeatNoter");
@@ -235,7 +239,7 @@ namespace NeatNoter
 
             for (var i = 0; i < this.notebook.Categories.Count; i++)
             {
-                DrawCategoryEntry(this.notebook.Categories[i], i, 38 + 51 * ImGui.GetIO().FontGlobalScale);
+                DrawCategoryEntry(this.notebook.Categories[i], i, 38 + 51 * fontScale);
             }
 
             return true;
