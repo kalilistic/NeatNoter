@@ -175,7 +175,7 @@ namespace NeatNoter
 
             for (var i = 0; i < this.notebook.Notes.Count; i++)
             {
-                DrawNoteEntry(this.notebook.Notes[i], i, 89 * ImGui.GetIO().FontGlobalScale);
+                DrawNoteEntry(this.notebook.Notes[i], i, 38 + 51 * ImGui.GetIO().FontGlobalScale);
             }
 
             return true;
@@ -235,7 +235,7 @@ namespace NeatNoter
 
             for (var i = 0; i < this.notebook.Categories.Count; i++)
             {
-                DrawCategoryEntry(this.notebook.Categories[i], i, 89 * ImGui.GetIO().FontGlobalScale);
+                DrawCategoryEntry(this.notebook.Categories[i], i, 38 + 51 * ImGui.GetIO().FontGlobalScale);
             }
 
             return true;
@@ -325,7 +325,7 @@ namespace NeatNoter
                 .ToList();
             for (var i = 0; i < results.Count; i++)
             {
-                DrawNoteEntry(results[i], i, 116 * ImGui.GetIO().FontGlobalScale);
+                DrawNoteEntry(results[i], i, 48 + 68 * ImGui.GetIO().FontGlobalScale);
             }
 
             return true;
@@ -394,8 +394,8 @@ namespace NeatNoter
         private void DrawNoteEntry(Note note, int index, float heightOffset)
         {
             var fontScale = ImGui.GetIO().FontGlobalScale;
-            var heightMod = 29 * fontScale;
-            heightOffset -= ImGui.GetScrollY() * fontScale;
+            var heightMod = 4 + 25 * fontScale;
+            heightOffset -= ImGui.GetScrollY();
 
             var lineOffset = ElementSizeX * 0.3f;
             var windowPos = ImGui.GetWindowPos();
@@ -492,7 +492,7 @@ namespace NeatNoter
         private void DrawCategoryEntry(Category category, int index, float heightOffset)
         {
             var fontScale = ImGui.GetIO().FontGlobalScale;
-            var heightMod = 29 * fontScale;
+            var heightMod = 4 + 25 * fontScale;
             heightOffset -= ImGui.GetScrollY() * fontScale;
 
             var color = new Vector4(category.Color, 0.5f);
