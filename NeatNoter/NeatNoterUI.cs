@@ -143,7 +143,7 @@ namespace NeatNoter
 
             var fontScale = ImGui.GetIO().FontGlobalScale;
 
-            ImGui.SameLine(ElementSizeX - 133 * fontScale);
+            ImGui.SameLine(ElementSizeX - 149 * fontScale);
             if (ImGui.Button("Sort##NeatNoter-1"))
             {
                 ImGui.OpenPopup("Sort Context Menu##NeatNoter");
@@ -258,7 +258,7 @@ namespace NeatNoter
 
                 ImGui.SameLine();
                 if (ImGui.Button(this.categoryWindowVisible ? "Close category selection" : "Choose categories",
-                    new Vector2(ElementSizeX - 44, 23)))
+                    new Vector2(ElementSizeX - 60 * ImGui.GetIO().FontGlobalScale, 23 * ImGui.GetIO().FontGlobalScale)))
                     this.categoryWindowVisible = !this.categoryWindowVisible;
                 CategorySelectionWindow(this.currentNote.Categories);
             }
@@ -567,7 +567,7 @@ namespace NeatNoter
                 color.W = this.editorTransparency;
             }
             ImGui.PushStyleColor(ImGuiCol.FrameBg, color);
-            if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize, new Vector2(ElementSizeX, WindowSizeY - (this.minimalView ? 40 : 94)), inputFlags))
+            if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize, new Vector2(ElementSizeX - 16 * ImGui.GetIO().FontGlobalScale, WindowSizeY - (this.minimalView ? 40 : 94)), inputFlags))
             {
                 document.Body = body;
             }
