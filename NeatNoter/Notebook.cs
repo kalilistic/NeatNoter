@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Windows.Forms;
+using Dalamud.Logging;
 using Dalamud.Plugin;
 
 namespace NeatNoter

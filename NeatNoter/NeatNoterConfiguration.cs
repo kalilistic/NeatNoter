@@ -35,15 +35,10 @@ namespace NeatNoter
             JustInstalled = true;
         }
 
-        [JsonIgnore]
-        private DalamudPluginInterface pluginInterface;
-
-        public void Initialize(DalamudPluginInterface pi, Action onPlayerLoad = null)
+        public void Initialize(Action onPlayerLoad = null)
         {
-            this.pluginInterface = pi;
-
-            Notes.InitializeAll(this.pluginInterface);
-            Categories.InitializeAll(this.pluginInterface);
+            Notes.InitializeAll(NeatNoterPlugin.PluginInterface);
+            Categories.InitializeAll(NeatNoterPlugin.PluginInterface);
 
             OnPlayerLoad(onPlayerLoad);
         }
@@ -56,7 +51,7 @@ namespace NeatNoter
             {
                 while (true)
                 {
-                    if (this.pluginInterface.ClientState.LocalContentId != 0)
+                    if (NeatNoterPlugin.ClientState.LocalContentId != 0)
                     {
                         fn();
                         break;
@@ -77,7 +72,7 @@ namespace NeatNoter
                 note.CompressBody();
             }
 
-            this.pluginInterface.SavePluginConfig(this);
+            NeatNoterPlugin.PluginInterface.SavePluginConfig(this);
         }
     }
 }

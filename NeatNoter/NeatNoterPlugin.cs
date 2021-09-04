@@ -1,39 +1,68 @@
 ﻿using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using System;
+using Dalamud.Game.ClientState;
+using Dalamud.Game.Gui;
+using Dalamud.IoC;
+using Dalamud.Logging;
 
 namespace NeatNoter
 {
     public class NeatNoterPlugin : IDalamudPlugin
     {
-        private DalamudPluginInterface pluginInterface;
-        private NeatNoterConfiguration config;
-        private NeatNoterUI ui;
-        private Notebook notebook;
-
-        public string Name => "NeatNoter";
-
-        public void Initialize(DalamudPluginInterface pluginInterface)
+        public NeatNoterPlugin()
         {
-            this.pluginInterface = pluginInterface;
-
-            this.config = (NeatNoterConfiguration)this.pluginInterface.GetPluginConfig() ?? new NeatNoterConfiguration();
-            this.config.Initialize(this.pluginInterface, () =>
+            this.config = (NeatNoterConfiguration)PluginInterface.GetPluginConfig()! ?? new NeatNoterConfiguration();
+            this.config.Initialize(() =>
             {
                 if (this.config.JustInstalled)
                 {
-                    this.pluginInterface.Framework.Gui.Chat.Print("NoteNoter has been installed! Type /notebook to open the notebook.");
+                    Chat.Print("NoteNoter has been installed! Type /notebook to open the notebook.");
                     this.config.JustInstalled = false;
                 }
             });
 
-            this.notebook = new Notebook(this.config, this.pluginInterface);
+            this.notebook = new Notebook(this.config, PluginInterface);
 
             this.ui = new NeatNoterUI(this.notebook, this.config);
-            this.pluginInterface.UiBuilder.OnBuildUi += this.ui.Draw;
+            PluginInterface.UiBuilder.Draw += this.ui.Draw;
             
             AddComandHandlers();
         }
+        
+        private NeatNoterConfiguration config;
+        private NeatNoterUI ui;
+        private Notebook notebook;
+
+        /// <summary>
+        /// Gets pluginInterface.
+        /// </summary>
+        [PluginService]
+        [RequiredVersion("1.0")]
+        public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
+        
+        /// <summary>
+        /// Gets chat gui.
+        /// </summary>
+        [PluginService]
+        [RequiredVersion("1.0")]
+        public static ChatGui Chat { get; private set; } = null!;
+        
+        /// <summary>
+        /// Gets command manager.
+        /// </summary>
+        [PluginService]
+        [RequiredVersion("1.0")]
+        public static CommandManager CommandManager { get; private set; } = null!;
+        
+        /// <summary>
+        /// Gets client state.
+        /// </summary>
+        [PluginService]
+        [RequiredVersion("1.0")]
+        public static ClientState ClientState { get; private set; } = null!;
+        
+        public string Name => "NeatNoter";
 
         private void ToggleNotebook(string command, string args)
         {
@@ -42,7 +71,7 @@ namespace NeatNoter
 
         private void AddComandHandlers()
         {
-            this.pluginInterface.CommandManager.AddHandler("/notebook", new CommandInfo(ToggleNotebook)
+            CommandManager.AddHandler("/notebook", new CommandInfo(ToggleNotebook)
             {
                 HelpMessage = "Open/close the NeatNoter notebook.",
                 ShowInHelp = true,
@@ -51,23 +80,31 @@ namespace NeatNoter
 
         private void RemoveCommandHandlers()
         {
-            this.pluginInterface.CommandManager.RemoveHandler("/notebook");
+            CommandManager.RemoveHandler("/notebook");
         }
 
         #region IDisposable Support
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            try
             {
-                RemoveCommandHandlers();
-                
-                this.pluginInterface.SavePluginConfig(this.config);
+                if (disposing)
+                {
+                    RemoveCommandHandlers();
 
-                this.pluginInterface.UiBuilder.OnBuildUi -= this.ui.Draw;
-                this.ui.Dispose();
+                    PluginInterface.SavePluginConfig(this.config);
 
-                this.pluginInterface.Dispose();
+                    PluginInterface.UiBuilder.Draw -= this.ui.Draw;
+                    this.ui.Dispose();
+
+                    PluginInterface.Dispose();
+                }
             }
+            catch(Exception ex)
+            {
+                PluginLog.Error(ex, "Failed to dispose properly.");
+            }
+
         }
 
         public void Dispose()
