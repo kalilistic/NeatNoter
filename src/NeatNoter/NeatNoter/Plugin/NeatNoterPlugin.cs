@@ -1,18 +1,26 @@
-﻿using Dalamud.Game.Command;
-using Dalamud.Plugin;
-using System;
+﻿using System;
+
 using Dalamud.Game.ClientState;
+using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
 using Dalamud.IoC;
 using Dalamud.Logging;
+using Dalamud.Plugin;
 
 namespace NeatNoter
 {
+    /// <inheritdoc />
     public class NeatNoterPlugin : IDalamudPlugin
     {
+        private readonly NeatNoterConfiguration config;
+        private readonly NeatNoterUI ui;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NeatNoterPlugin"/> class.
+        /// </summary>
         public NeatNoterPlugin()
         {
-            this.config = (NeatNoterConfiguration)PluginInterface.GetPluginConfig()! ?? new NeatNoterConfiguration();
+            this.config = (NeatNoterConfiguration)PluginInterface.GetPluginConfig() !;
             this.config.Initialize(() =>
             {
                 if (this.config.JustInstalled)
@@ -22,17 +30,13 @@ namespace NeatNoter
                 }
             });
 
-            this.notebook = new Notebook(this.config, PluginInterface);
+            var notebook = new Notebook(this.config, PluginInterface);
 
-            this.ui = new NeatNoterUI(this.notebook, this.config);
+            this.ui = new NeatNoterUI(notebook, this.config);
             PluginInterface.UiBuilder.Draw += this.ui.Draw;
-            
-            AddComandHandlers();
+
+            this.AddCommandHandlers();
         }
-        
-        private NeatNoterConfiguration config;
-        private NeatNoterUI ui;
-        private Notebook notebook;
 
         /// <summary>
         /// Gets pluginInterface.
@@ -40,50 +44,42 @@ namespace NeatNoter
         [PluginService]
         [RequiredVersion("1.0")]
         public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
-        
+
         /// <summary>
         /// Gets chat gui.
         /// </summary>
         [PluginService]
         [RequiredVersion("1.0")]
         public static ChatGui Chat { get; private set; } = null!;
-        
+
         /// <summary>
         /// Gets command manager.
         /// </summary>
         [PluginService]
         [RequiredVersion("1.0")]
         public static CommandManager CommandManager { get; private set; } = null!;
-        
+
         /// <summary>
         /// Gets client state.
         /// </summary>
         [PluginService]
         [RequiredVersion("1.0")]
         public static ClientState ClientState { get; private set; } = null!;
-        
+
+        /// <inheritdoc />
         public string Name => "NeatNoter";
 
-        private void ToggleNotebook(string command, string args)
+        /// <inheritdoc />
+        public void Dispose()
         {
-            this.ui.IsVisible = !this.ui.IsVisible;
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        private void AddComandHandlers()
-        {
-            CommandManager.AddHandler("/notebook", new CommandInfo(ToggleNotebook)
-            {
-                HelpMessage = "Open/close the NeatNoter notebook.",
-                ShowInHelp = true,
-            });
-        }
-
-        private void RemoveCommandHandlers()
-        {
-            CommandManager.RemoveHandler("/notebook");
-        }
-
-        #region IDisposable Support
+        /// <summary>
+        /// Dispose plugin.
+        /// </summary>
+        /// <param name="disposing">indicator whether disposing.</param>
         protected virtual void Dispose(bool disposing)
         {
             try
@@ -100,18 +96,29 @@ namespace NeatNoter
                     PluginInterface.Dispose();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 PluginLog.Error(ex, "Failed to dispose properly.");
             }
-
         }
 
-        public void Dispose()
+        private static void RemoveCommandHandlers()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            CommandManager.RemoveHandler("/notebook");
         }
-        #endregion
+
+        private void ToggleNotebook(string command, string args)
+        {
+            this.ui.IsVisible = !this.ui.IsVisible;
+        }
+
+        private void AddCommandHandlers()
+        {
+            CommandManager.AddHandler("/notebook", new CommandInfo(this.ToggleNotebook)
+            {
+                HelpMessage = "Open/close the NeatNoter notebook.",
+                ShowInHelp = true,
+            });
+        }
     }
 }
