@@ -1,1 +1,198 @@
-{}
+{
+    "NameAscending": {
+        "message": "",
+        "description": ""
+    },
+    "NameDescending": {
+        "message": "",
+        "description": ""
+    },
+    "CreatedAscending": {
+        "message": "",
+        "description": ""
+    },
+    "CreatedDescending": {
+        "message": "",
+        "description": ""
+    },
+    "ModifiedAscending": {
+        "message": "",
+        "description": ""
+    },
+    "ModifiedDescending": {
+        "message": "",
+        "description": ""
+    },
+    "DefaultNoteName": {
+        "message": "",
+        "description": ""
+    },
+    "DefaultCategoryName": {
+        "message": "",
+        "description": ""
+    },
+    "DefaultCategoryBody": {
+        "message": "",
+        "description": ""
+    },
+    "DeleteConfirmationHeader": {
+        "message": "",
+        "description": ""
+    },
+    "DeleteConfirmationSubHeader": {
+        "message": "",
+        "description": ""
+    },
+    "DeleteConfirmationWarning": {
+        "message": "",
+        "description": ""
+    },
+    "Yes": {
+        "message": "",
+        "description": ""
+    },
+    "No": {
+        "message": "",
+        "description": ""
+    },
+    "NewNote": {
+        "message": "",
+        "description": ""
+    },
+    "SortNotes": {
+        "message": "",
+        "description": ""
+    },
+    "FilterNotes": {
+        "message": "",
+        "description": ""
+    },
+    "NoCategory": {
+        "message": "",
+        "description": ""
+    },
+    "NewCategory": {
+        "message": "",
+        "description": ""
+    },
+    "SortCategories": {
+        "message": "",
+        "description": ""
+    },
+    "Back": {
+        "message": "",
+        "description": ""
+    },
+    "ChooseCategories": {
+        "message": "",
+        "description": ""
+    },
+    "CloseCategorySelection": {
+        "message": "",
+        "description": ""
+    },
+    "Color": {
+        "message": "",
+        "description": ""
+    },
+    "Notes": {
+        "message": "",
+        "description": ""
+    },
+    "Categories": {
+        "message": "",
+        "description": ""
+    },
+    "DeleteNote": {
+        "message": "",
+        "description": ""
+    },
+    "CategorySelection": {
+        "message": "",
+        "description": ""
+    },
+    "NoCategoriesToChoose": {
+        "message": "",
+        "description": ""
+    },
+    "ViewNotes": {
+        "message": "",
+        "description": ""
+    },
+    "EditCategory": {
+        "message": "",
+        "description": ""
+    },
+    "DeleteCategory": {
+        "message": "",
+        "description": ""
+    },
+    "Title": {
+        "message": "",
+        "description": ""
+    },
+    "EditorContextMenu": {
+        "message": "",
+        "description": ""
+    },
+    "MinimalView": {
+        "message": "",
+        "description": ""
+    },
+    "EndMinimalView": {
+        "message": "",
+        "description": ""
+    },
+    "HideBackground": {
+        "message": "",
+        "description": ""
+    },
+    "ShowBackground": {
+        "message": "",
+        "description": ""
+    },
+    "ShowEditorTransparencySlider": {
+        "message": "",
+        "description": ""
+    },
+    "HideEditorTransparencySlider": {
+        "message": "",
+        "description": ""
+    },
+    "TransparencySlider": {
+        "message": "",
+        "description": ""
+    },
+    "Settings": {
+        "message": "",
+        "description": ""
+    },
+    "Search": {
+        "message": "",
+        "description": ""
+    },
+    "IncludeNoteContents": {
+        "message": "",
+        "description": ""
+    },
+    "Backup": {
+        "message": "",
+        "description": ""
+    },
+    "Export": {
+        "message": "",
+        "description": ""
+    },
+    "Import": {
+        "message": "",
+        "description": ""
+    },
+    "SecondaryBackupDirectoryPath": {
+        "message": "",
+        "description": ""
+    },
+    "Browse": {
+        "message": "",
+        "description": ""
+    }
+}
