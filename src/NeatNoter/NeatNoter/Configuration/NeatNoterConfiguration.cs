@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
-using System.Threading.Tasks;
 
 using Dalamud.Configuration;
 
@@ -10,20 +8,6 @@ namespace NeatNoter
     /// <inheritdoc />
     public class NeatNoterConfiguration : IPluginConfiguration
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NeatNoterConfiguration"/> class.
-        /// </summary>
-        public NeatNoterConfiguration()
-        {
-            this.Notes = new List<Note>();
-            this.Categories = new List<Category>();
-
-            this.PenThickness = 2.0f;
-            this.PenColor = new Vector3(1.0f, 1.0f, 1.0f);
-
-            this.JustInstalled = true;
-        }
-
         /// <inheritdoc />
         public int Version { get; set; }
 
@@ -33,29 +17,9 @@ namespace NeatNoter
         public bool IncludeNoteBodiesInSearch { get; set; }
 
         /// <summary>
-        /// Gets or sets pen thickness.
-        /// </summary>
-        public float PenThickness { get; set; }
-
-        /// <summary>
-        /// Gets or sets pen color.
-        /// </summary>
-        public Vector3 PenColor { get; set; }
-
-        /// <summary>
-        /// Gets or sets notes.
-        /// </summary>
-        public List<Note> Notes { get; set; }
-
-        /// <summary>
-        /// Gets or sets categories.
-        /// </summary>
-        public List<Category> Categories { get; set; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether fresh install.
         /// </summary>
-        public bool JustInstalled { get; set; }
+        public bool JustInstalled { get; set; } = true;
 
         /// <summary>
         /// Gets or sets automatic export path.
@@ -63,52 +27,55 @@ namespace NeatNoter
         public string? AutomaticExportPath { get; set; }
 
         /// <summary>
-        /// Initialize config.
+        /// Gets or sets save frequency in ms.
         /// </summary>
-        /// <param name="onPlayerLoad">on player load.</param>
-        public void Initialize(Action? onPlayerLoad = null)
-        {
-            this.Notes.InitializeAll(NeatNoterPlugin.PluginInterface);
-            this.Categories.InitializeAll(NeatNoterPlugin.PluginInterface);
-
-            OnPlayerLoad(onPlayerLoad);
-        }
+        public int SaveFrequency { get; set; } = 5000;
 
         /// <summary>
-        /// Save notes.
+        /// Gets or sets a value indicating whether no category notes are selected.
         /// </summary>
-        public void Save()
-        {
-            foreach (var category in this.Categories)
-            {
-                category.CompressBody();
-            }
+        public bool IsNoCategorySelected { get; set; } = true;
 
-            foreach (var note in this.Notes)
-            {
-                note.CompressBody();
-            }
+        /// <summary>
+        /// Gets or sets note sort type.
+        /// </summary>
+        public int NoteSortType { get; set; } = 4;
 
-            NeatNoterPlugin.PluginInterface.SavePluginConfig(this);
-        }
+        /// <summary>
+        /// Gets or sets category sort type.
+        /// </summary>
+        public int CategorySortType { get; set; } = 4;
 
-        private static void OnPlayerLoad(Action? fn)
-        {
-            if (fn == null) return;
+        /// <summary>
+        /// Gets or sets number of backups to keep before deleting the oldest.
+        /// </summary>
+        public int BackupRetention { get; set; } = 7;
 
-            _ = Task.Run(async () =>
-            {
-                while (true)
-                {
-                    if (NeatNoterPlugin.ClientState.LocalContentId != 0)
-                    {
-                        fn();
-                        break;
-                    }
+        /// <summary>
+        /// Gets or sets backup frequency in ms.
+        /// </summary>
+        public long BackupFrequency { get; set; } = 86400000;
 
-                    await Task.Delay(1000);
-                }
-            });
-        }
+        /// <summary>
+        /// Gets or sets last backup in ms.
+        /// </summary>
+        public long LastBackup { get; set; }
+
+        /// <summary>
+        /// Gets or sets plugin version to use for special processing on upgrades.
+        /// </summary>
+        public int PluginVersion { get; set; }
+
+        /// <summary>
+        /// Gets or sets notes.
+        /// </summary>
+        [Obsolete("Use DB now")]
+        public List<Note> Notes { get; set; } = new ();
+
+        /// <summary>
+        /// Gets or sets categories.
+        /// </summary>
+        [Obsolete("Use DB now")]
+        public List<Category> Categories { get; set; } = new ();
     }
 }

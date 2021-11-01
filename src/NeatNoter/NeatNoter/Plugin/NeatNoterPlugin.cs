@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Reflection;
+using System.Timers;
 
+using Dalamud.DrunkenToad;
 using Dalamud.Game.ClientState;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
@@ -12,30 +15,78 @@ namespace NeatNoter
     /// <inheritdoc />
     public class NeatNoterPlugin : IDalamudPlugin
     {
-        private readonly NeatNoterConfiguration config;
-        private readonly NeatNoterUI ui;
+        /// <summary>
+        /// Plugin configuration.
+        /// </summary>
+        public readonly NeatNoterConfiguration Configuration;
+
+        /// <summary>
+        /// Notebook.
+        /// </summary>
+        public readonly NotebookService NotebookService;
+
+        /// <summary>
+        /// Window Manager.
+        /// </summary>
+        public readonly WindowManager WindowManager = null!;
+
+        /// <summary>
+        /// Backup manager.
+        /// </summary>
+        public BackupManager BackupManager;
+
+        private readonly Timer backupTimer;
+        private readonly Localization localization;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NeatNoterPlugin"/> class.
         /// </summary>
         public NeatNoterPlugin()
         {
-            this.config = (NeatNoterConfiguration)PluginInterface.GetPluginConfig() !;
-            this.config.Initialize(() =>
+            // load config
+            try
             {
-                if (this.config.JustInstalled)
-                {
-                    Chat.Print("NoteNoter has been installed! Type /notebook to open the notebook.");
-                    this.config.JustInstalled = false;
-                }
-            });
+                this.Configuration = PluginInterface.GetPluginConfig() as NeatNoterConfiguration ??
+                                     new NeatNoterConfiguration();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Failed to load config so creating new one.", ex);
+                this.Configuration = new NeatNoterConfiguration();
+                this.SaveConfig();
+            }
 
-            var notebook = new Notebook(this.config, PluginInterface);
+            // load services
+            this.localization = new Localization(PluginInterface, CommandManager);
+            this.BackupManager = new BackupManager(PluginInterface.GetPluginConfigDirectory());
+            this.NotebookService = new NotebookService(this);
 
-            this.ui = new NeatNoterUI(notebook, this.config);
-            PluginInterface.UiBuilder.Draw += this.ui.Draw;
+            // run backup
+            this.backupTimer = new Timer { Interval = this.Configuration.BackupFrequency, Enabled = false };
+            this.backupTimer.Elapsed += this.BackupTimerOnElapsed;
+            var pluginVersion = Assembly.GetExecutingAssembly().VersionNumber();
+            if (this.Configuration.PluginVersion < pluginVersion)
+            {
+                Logger.LogInfo("Running backup since new version detected.");
+                this.RunUpgradeBackup();
+                this.Configuration.PluginVersion = pluginVersion;
+                this.SaveConfig();
+            }
+            else
+            {
+                this.BackupTimerOnElapsed(this, null);
+            }
 
-            this.AddCommandHandlers();
+            // attempt to migrate if needed
+            var success = Migrator.Migrate(this);
+            if (success)
+            {
+                this.HandleJustInstalled();
+                this.NotebookService.Start();
+                this.backupTimer.Enabled = true;
+                this.WindowManager = new WindowManager(this);
+                this.PluginCommandManager = new PluginCommandManager(this);
+            }
         }
 
         /// <summary>
@@ -66,14 +117,36 @@ namespace NeatNoter
         [RequiredVersion("1.0")]
         public static ClientState ClientState { get; private set; } = null!;
 
+        /// <summary>
+        /// Gets or sets command manager to handle user commands.
+        /// </summary>
+        public PluginCommandManager PluginCommandManager { get; set; } = null!;
+
         /// <inheritdoc />
         public string Name => "NeatNoter";
+
+        /// <summary>
+        /// Get plugin folder.
+        /// </summary>
+        /// <returns>plugin folder name.</returns>
+        public static string GetPluginFolder()
+        {
+            return PluginInterface.GetPluginConfigDirectory();
+        }
 
         /// <inheritdoc />
         public void Dispose()
         {
             this.Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Save configuration.
+        /// </summary>
+        public void SaveConfig()
+        {
+            PluginInterface.SavePluginConfig(this.Configuration);
         }
 
         /// <summary>
@@ -86,13 +159,13 @@ namespace NeatNoter
             {
                 if (disposing)
                 {
-                    RemoveCommandHandlers();
-
-                    PluginInterface.SavePluginConfig(this.config);
-
-                    PluginInterface.UiBuilder.Draw -= this.ui.Draw;
-                    this.ui.Dispose();
-
+                    this.backupTimer.Elapsed -= this.BackupTimerOnElapsed;
+                    this.backupTimer.Dispose();
+                    this.PluginCommandManager.Dispose();
+                    PluginInterface.SavePluginConfig(this.Configuration);
+                    this.WindowManager.Dispose();
+                    this.NotebookService.Dispose();
+                    this.localization.Dispose();
                     PluginInterface.Dispose();
                 }
             }
@@ -102,23 +175,35 @@ namespace NeatNoter
             }
         }
 
-        private static void RemoveCommandHandlers()
+        private void HandleJustInstalled()
         {
-            CommandManager.RemoveHandler("/notebook");
-        }
-
-        private void ToggleNotebook(string command, string args)
-        {
-            this.ui.IsVisible = !this.ui.IsVisible;
-        }
-
-        private void AddCommandHandlers()
-        {
-            CommandManager.AddHandler("/notebook", new CommandInfo(this.ToggleNotebook)
+            if (!this.Configuration.JustInstalled)
             {
-                HelpMessage = "Open/close the NeatNoter notebook.",
-                ShowInHelp = true,
-            });
+                return;
+            }
+
+            this.NotebookService.SetVersion(2);
+            Chat.PluginPrintNotice("NoteNoter has been installed! Type /notebook to open the notebook.");
+            this.Configuration.JustInstalled = false;
+            this.SaveConfig();
+        }
+
+        private void BackupTimerOnElapsed(object sender, ElapsedEventArgs? e)
+        {
+            if (DateUtil.CurrentTime() > this.Configuration.LastBackup + this.Configuration.BackupFrequency)
+            {
+                Logger.LogInfo("Running backup due to frequency timer.");
+                this.Configuration.LastBackup = DateUtil.CurrentTime();
+                this.BackupManager.CreateBackup();
+                this.BackupManager.DeleteBackups(this.Configuration.BackupRetention);
+            }
+        }
+
+        private void RunUpgradeBackup()
+        {
+            this.Configuration.LastBackup = DateUtil.CurrentTime();
+            this.BackupManager.CreateBackup("upgrade/v" + this.Configuration.PluginVersion + "_");
+            this.BackupManager.DeleteBackups(this.Configuration.BackupRetention);
         }
     }
 }

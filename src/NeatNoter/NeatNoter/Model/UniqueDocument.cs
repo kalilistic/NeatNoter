@@ -1,25 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Numerics;
 using System.Text;
 
+using LiteDB;
 using Newtonsoft.Json;
 
 namespace NeatNoter
 {
     /// <summary>
-    /// Note.
+    /// Common document.
     /// </summary>
     public abstract class UniqueDocument : IEquatable<UniqueDocument>
     {
+        [BsonIgnore]
         [JsonIgnore]
         private string typeName = string.Empty;
 
         /// <summary>
-        /// Gets or sets note name.
+        /// Gets or sets document name.
         /// </summary>
+        [BsonIgnore]
         [JsonIgnore]
         public string Name
         {
@@ -28,31 +29,48 @@ namespace NeatNoter
         }
 
         /// <summary>
-        /// Gets note ID.
+        /// Gets document ID.
         /// </summary>
+        [BsonIgnore]
         [JsonIgnore]
         public string IdentifierString => this.InternalName[this.InternalName.IndexOf("#", StringComparison.Ordinal) ..];
 
         /// <summary>
-        /// Gets or sets note internal name.
+        /// Gets or sets id.
+        /// </summary>
+        public int Id { get; set; }
+
+        /// <summary>
+        /// Gets or sets document internal name.
         /// </summary>
         public string InternalName { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets note body.
+        /// Gets or sets document body.
         /// </summary>
+        [BsonIgnore]
         [JsonIgnore]
         public string Body { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets note internal body.
+        /// Gets or sets document internal body.
         /// </summary>
         public string InternalBody { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets lines.
+        /// Gets or sets a value indicating whether document is visible.
         /// </summary>
-        public List<(Vector2, Vector2, Vector3, float)> Lines { get; set; } = new ();
+        public bool IsVisible { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets created date (unix timestamp).
+        /// </summary>
+        public long Created { get; set; }
+
+        /// <summary>
+        /// Gets or sets last modified date (unix timestamp).
+        /// </summary>
+        public long Modified { get; set; }
 
         /// <summary>
         /// Compress string.

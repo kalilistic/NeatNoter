@@ -11,5 +11,10 @@ namespace NeatNoter
         /// Gets or sets category color.
         /// </summary>
         public Vector3 Color { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether selected for display.
+        /// </summary>
+        public bool IsSelected { get; set; } = true;
     }
 }
