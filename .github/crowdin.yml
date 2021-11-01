@@ -1,6 +1,7 @@
 project_id_env: CROWDIN_PROJECT_ID
 api_token_env: CROWDIN_PERSONAL_TOKEN
 preserve_hierarchy: false
+skip_untranslated_files: true
 download_translations_args: '--all --skip-untranslated-strings'
 files:
   - source: src/NeatNoter/NeatNoter/Resource/source/NeatNoter_Localizable.json
