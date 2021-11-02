@@ -84,6 +84,7 @@ namespace NeatNoter
                 this.HandleJustInstalled();
                 this.NotebookService.Start();
                 this.backupTimer.Enabled = true;
+                DocumentSortType.Init();
                 this.WindowManager = new WindowManager(this);
                 this.PluginCommandManager = new PluginCommandManager(this);
             }

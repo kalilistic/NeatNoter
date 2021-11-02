@@ -86,6 +86,19 @@ namespace NeatNoter
         }
 
         /// <summary>
+        /// Initialize names.
+        /// </summary>
+        public static void Init()
+        {
+            NameAscending.Name = Loc.Localize("NameAscending", "Name (Ascending)");
+            NameDescending.Name = Loc.Localize("NameDescending", "Name (Descending)");
+            CreatedAscending.Name = Loc.Localize("CreatedAscending", "Created (Ascending)");
+            CreatedDescending.Name = Loc.Localize("CreatedDescending", "Created (Descending)");
+            ModifiedAscending.Name = Loc.Localize("ModifiedAscending", "Modified (Ascending)");
+            ModifiedDescending.Name = Loc.Localize("ModifiedDescending", "Modified (Descending)");
+        }
+
+        /// <summary>
         /// Return sort name.
         /// </summary>
         /// <returns>sort name.</returns>
