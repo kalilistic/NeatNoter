@@ -1,1 +1,198 @@
-{}
+{
+    "NameAscending": {
+        "message": "Nom (Croissant)",
+        "description": "DocumentSortType..cctor"
+    },
+    "NameDescending": {
+        "message": "Nom (Décroissant)",
+        "description": "DocumentSortType..cctor"
+    },
+    "CreatedAscending": {
+        "message": "Crée (Croissant)",
+        "description": "DocumentSortType..cctor"
+    },
+    "CreatedDescending": {
+        "message": "Crée (Décroissant)",
+        "description": "DocumentSortType..cctor"
+    },
+    "ModifiedAscending": {
+        "message": "Modifié (Croissant)",
+        "description": "DocumentSortType..cctor"
+    },
+    "ModifiedDescending": {
+        "message": "Modifié (Décroissant)",
+        "description": "DocumentSortType..cctor"
+    },
+    "DefaultNoteName": {
+        "message": "Nouvelle Note",
+        "description": "NotebookService.CreateNote"
+    },
+    "DefaultCategoryName": {
+        "message": "Nouvelle Catégorie",
+        "description": "NotebookService.CreateCategory"
+    },
+    "DefaultCategoryBody": {
+        "message": "Description de la Catégorie",
+        "description": "NotebookService.CreateCategory"
+    },
+    "DeleteConfirmationHeader": {
+        "message": "NeatNoter Confirmation de la Suppression",
+        "description": "NotebookWindow.DrawDeletionConfirmationWindow"
+    },
+    "DeleteConfirmationSubHeader": {
+        "message": "Êtes-vous sûr de vouloir supprimer cet élément ?",
+        "description": "NotebookWindow.DrawDeletionConfirmationWindow"
+    },
+    "DeleteConfirmationWarning": {
+        "message": "Cette action est irréversible.",
+        "description": "NotebookWindow.DrawDeletionConfirmationWindow"
+    },
+    "Yes": {
+        "message": "Oui",
+        "description": "NotebookWindow.DrawDeletionConfirmationWindow"
+    },
+    "No": {
+        "message": "Non",
+        "description": "NotebookWindow.DrawDeletionConfirmationWindow"
+    },
+    "NewNote": {
+        "message": "Nouvelle Note",
+        "description": "NotebookWindow.DrawNoteIndex"
+    },
+    "SortNotes": {
+        "message": "Trier",
+        "description": "NotebookWindow.DrawNoteIndex"
+    },
+    "FilterNotes": {
+        "message": "Filtre",
+        "description": "NotebookWindow.DrawNoteIndex"
+    },
+    "NoCategory": {
+        "message": "Aucune Catégorie",
+        "description": "NotebookWindow.DrawNoteIndex"
+    },
+    "NewCategory": {
+        "message": "Nouvelle Catégorie",
+        "description": "NotebookWindow.DrawCategoryIndex"
+    },
+    "SortCategories": {
+        "message": "Trier",
+        "description": "NotebookWindow.DrawCategoryIndex"
+    },
+    "Back": {
+        "message": "Retour",
+        "description": "NotebookWindow.DrawNoteEditTool"
+    },
+    "ChooseCategories": {
+        "message": "Choisir les catégories",
+        "description": "NotebookWindow.DrawNoteEditTool"
+    },
+    "CloseCategorySelection": {
+        "message": "Fermer la sélection de catégorie",
+        "description": "NotebookWindow.DrawNoteEditTool"
+    },
+    "Color": {
+        "message": "Couleur",
+        "description": "NotebookWindow.DrawCategoryEditTool"
+    },
+    "Notes": {
+        "message": "Notes",
+        "description": "NotebookWindow.DrawTabBar"
+    },
+    "Categories": {
+        "message": "Catégories",
+        "description": "NotebookWindow.DrawTabBar"
+    },
+    "DeleteNote": {
+        "message": "Supprimer la Note",
+        "description": "NotebookWindow.DrawNoteEntry"
+    },
+    "CategorySelection": {
+        "message": "Sélectionner la Catégorie",
+        "description": "NotebookWindow.CategorySelectionWindow"
+    },
+    "NoCategoriesToChoose": {
+        "message": "Aucunes catégories à choisir.",
+        "description": "NotebookWindow.CategorySelectionWindow"
+    },
+    "ViewNotes": {
+        "message": "Voir les Notes",
+        "description": "NotebookWindow.DrawCategoryEntry"
+    },
+    "EditCategory": {
+        "message": "Modifier la Catégorie",
+        "description": "NotebookWindow.DrawCategoryEntry"
+    },
+    "DeleteCategory": {
+        "message": "Supprimer la Catégorie",
+        "description": "NotebookWindow.DrawCategoryEntry"
+    },
+    "Title": {
+        "message": "Titre",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "EditorContextMenu": {
+        "message": "Menu Contextuel de L'Éditeur",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "MinimalView": {
+        "message": "Vue minimale",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "EndMinimalView": {
+        "message": "Quitter la vue minimale",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "HideBackground": {
+        "message": "Cacher le fond",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "ShowBackground": {
+        "message": "Montrer le fond",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "ShowEditorTransparencySlider": {
+        "message": "Montrer le modificateur de transparence",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "HideEditorTransparencySlider": {
+        "message": "Cacher le modificateur de transparence",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "TransparencySlider": {
+        "message": "Modificateur de transparence",
+        "description": "NotebookWindow.DrawTransparencySlider"
+    },
+    "Settings": {
+        "message": "NeatNoter Configuration",
+        "description": "SettingsWindow..ctor"
+    },
+    "Search": {
+        "message": "Recherche",
+        "description": "SettingsWindow.DrawSearch"
+    },
+    "IncludeNoteContents": {
+        "message": "Inclure le contenu des notes",
+        "description": "SettingsWindow.DrawSearch"
+    },
+    "Backup": {
+        "message": "Sauvegarde",
+        "description": "SettingsWindow.DrawBackup"
+    },
+    "Export": {
+        "message": "Exporter",
+        "description": "SettingsWindow.DrawBackup"
+    },
+    "Import": {
+        "message": "Importer",
+        "description": "SettingsWindow.DrawBackup"
+    },
+    "SecondaryBackupDirectoryPath": {
+        "message": "Répertoire Secondaire de Sauvegarde",
+        "description": "SettingsWindow.DrawBackup"
+    },
+    "Browse": {
+        "message": "Parcourir",
+        "description": "SettingsWindow.DrawBackup"
+    }
+}
