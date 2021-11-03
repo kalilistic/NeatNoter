@@ -2,6 +2,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 
 using CheapLoc;
+using Dalamud.DrunkenToad;
 using Dalamud.Interface.Colors;
 using ImGuiNET;
 
@@ -53,13 +54,13 @@ namespace NeatNoter
             ImGui.TextColored(ImGuiColors.DalamudViolet, Loc.Localize("Backup", "Backup"));
             ImGui.BeginChild("###Backup", new Vector2(-1, 95f), true);
             {
-                if (ImGui.Button(Loc.Localize("Export", "Export") + "###NeatNoter"))
+                if (ImGui.Button(Loc.Localize("Export", "Export") + "###NeatNoter_Button_Export"))
                 {
                     Task.Run(() => this.plugin.NotebookService.CreateBackup());
                 }
 
                 ImGui.SameLine();
-                if (ImGui.Button(Loc.Localize("Import", "Import") + "###NeatNoter"))
+                if (ImGui.Button(Loc.Localize("Import", "Import") + "###NeatNoter_Button_Import"))
                 {
                     Task.Run(() => this.plugin.NotebookService.LoadBackup());
                 }
