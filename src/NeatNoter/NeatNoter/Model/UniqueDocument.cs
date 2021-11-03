@@ -24,7 +24,7 @@ namespace NeatNoter
         [JsonIgnore]
         public string Name
         {
-            get => this.InternalName[..this.InternalName.IndexOf("#", StringComparison.Ordinal)];
+            get => this.InternalName[..this.InternalName.LastIndexOf("##-", StringComparison.Ordinal)];
             set => this.InternalName = value + this.IdentifierString;
         }
 
@@ -33,7 +33,7 @@ namespace NeatNoter
         /// </summary>
         [BsonIgnore]
         [JsonIgnore]
-        public string IdentifierString => this.InternalName[this.InternalName.IndexOf("#", StringComparison.Ordinal) ..];
+        public string IdentifierString => this.InternalName[this.InternalName.LastIndexOf("##-", StringComparison.Ordinal) ..];
 
         /// <summary>
         /// Gets or sets id.
