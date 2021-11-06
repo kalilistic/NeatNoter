@@ -39,7 +39,12 @@ namespace NeatNoter
 
         private void ToggleNotebook(string command, string args)
         {
-            this.plugin.WindowManager.NotebookWindow?.Toggle();
+            if (this.plugin.WindowManager.NotebookWindow != null)
+            {
+                this.plugin.WindowManager.NotebookWindow.Toggle();
+                this.plugin.Configuration.IsVisible = this.plugin.WindowManager.NotebookWindow.IsOpen;
+                this.plugin.SaveConfig();
+            }
         }
 
         private void ToggleSettings(string command, string arguments)

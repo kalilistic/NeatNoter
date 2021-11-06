@@ -77,5 +77,10 @@ namespace NeatNoter
         /// </summary>
         [Obsolete("Use DB now")]
         public List<Category> Categories { get; set; } = new ();
+
+        /// <summary>
+        /// Gets or sets a value indicating whether notebook window is visible.
+        /// </summary>
+        public bool IsVisible { get; set; } = true;
     }
 }

@@ -21,7 +21,7 @@ namespace NeatNoter
             this.WindowSystem = new WindowSystem("NeatNoterWindowSystem");
             this.WindowSystem.AddWindow(this.NotebookWindow);
             this.WindowSystem.AddWindow(this.SettingsWindow);
-            this.NotebookWindow.IsOpen = true;
+            this.NotebookWindow.IsOpen = plugin.Configuration.IsVisible;
 
             // add event listeners
             NeatNoterPlugin.PluginInterface.UiBuilder.Draw += this.Draw;

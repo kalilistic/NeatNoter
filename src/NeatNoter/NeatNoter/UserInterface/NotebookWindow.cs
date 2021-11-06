@@ -44,7 +44,7 @@ namespace NeatNoter
             this.noteSearchEntry = string.Empty;
             this.backgroundVisible = true;
             this.Size = new Vector2(400, 600) * ImGui.GetIO().FontGlobalScale;
-            this.SizeCondition = ImGuiCond.Appearing;
+            this.SizeCondition = ImGuiCond.FirstUseEver;
             this.previousNote = string.Empty;
             this.noteTabFlags = ImGuiTabItemFlags.None;
             this.categoryTabFlags = ImGuiTabItemFlags.None;
@@ -67,6 +67,20 @@ namespace NeatNoter
         private static float WindowSizeY => ImGui.GetWindowSize().Y * ImGui.GetIO().FontGlobalScale;
 
         private static float ElementSizeX => ImGui.GetWindowSize().X - (16 * InverseFontScale);
+
+        /// <inheritdoc />
+        public override void OnOpen()
+        {
+            this.plugin.Configuration.IsVisible = true;
+            this.plugin.SaveConfig();
+        }
+
+        /// <inheritdoc />
+        public override void OnClose()
+        {
+            this.plugin.Configuration.IsVisible = false;
+            this.plugin.SaveConfig();
+        }
 
         /// <inheritdoc/>
         public override void Draw()
