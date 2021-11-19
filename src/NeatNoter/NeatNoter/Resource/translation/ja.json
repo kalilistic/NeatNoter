@@ -1,1 +1,198 @@
-{}
+{
+    "NameAscending": {
+        "message": "名前 (昇順)",
+        "description": "DocumentSortType..cctor"
+    },
+    "NameDescending": {
+        "message": "名前 (降順)",
+        "description": "DocumentSortType..cctor"
+    },
+    "CreatedAscending": {
+        "message": "作成済み (昇順)",
+        "description": "DocumentSortType..cctor"
+    },
+    "CreatedDescending": {
+        "message": "作成済み (降順)",
+        "description": "DocumentSortType..cctor"
+    },
+    "ModifiedAscending": {
+        "message": "変更済み (昇順)",
+        "description": "DocumentSortType..cctor"
+    },
+    "ModifiedDescending": {
+        "message": "変更済み (降順)",
+        "description": "DocumentSortType..cctor"
+    },
+    "DefaultNoteName": {
+        "message": "新規メモ",
+        "description": "NotebookService.CreateNote"
+    },
+    "DefaultCategoryName": {
+        "message": "新規カテゴリ",
+        "description": "NotebookService.CreateCategory"
+    },
+    "DefaultCategoryBody": {
+        "message": "カテゴリの説明",
+        "description": "NotebookService.CreateCategory"
+    },
+    "DeleteConfirmationHeader": {
+        "message": "NeatNoter 削除の確認",
+        "description": "NotebookWindow.DrawDeletionConfirmationWindow"
+    },
+    "DeleteConfirmationSubHeader": {
+        "message": "本当に削除しますか？",
+        "description": "NotebookWindow.DrawDeletionConfirmationWindow"
+    },
+    "DeleteConfirmationWarning": {
+        "message": "この操作は元に戻すことができません。",
+        "description": "NotebookWindow.DrawDeletionConfirmationWindow"
+    },
+    "Yes": {
+        "message": "はい",
+        "description": "NotebookWindow.DrawDeletionConfirmationWindow"
+    },
+    "No": {
+        "message": "いいえ",
+        "description": "NotebookWindow.DrawDeletionConfirmationWindow"
+    },
+    "NewNote": {
+        "message": "新規メモ",
+        "description": "NotebookWindow.DrawNoteIndex"
+    },
+    "SortNotes": {
+        "message": "並べ替え",
+        "description": "NotebookWindow.DrawNoteIndex"
+    },
+    "FilterNotes": {
+        "message": "フィルター",
+        "description": "NotebookWindow.DrawNoteIndex"
+    },
+    "NoCategory": {
+        "message": "カテゴリなし",
+        "description": "NotebookWindow.DrawNoteIndex"
+    },
+    "NewCategory": {
+        "message": "新規カテゴリ",
+        "description": "NotebookWindow.DrawCategoryIndex"
+    },
+    "SortCategories": {
+        "message": "並べ替え",
+        "description": "NotebookWindow.DrawCategoryIndex"
+    },
+    "Back": {
+        "message": "戻る",
+        "description": "NotebookWindow.DrawNoteEditTool"
+    },
+    "ChooseCategories": {
+        "message": "カテゴリ選択",
+        "description": "NotebookWindow.DrawNoteEditTool"
+    },
+    "CloseCategorySelection": {
+        "message": "カテゴリ選択を閉じる",
+        "description": "NotebookWindow.DrawNoteEditTool"
+    },
+    "Color": {
+        "message": "色",
+        "description": "NotebookWindow.DrawCategoryEditTool"
+    },
+    "Notes": {
+        "message": "メモ",
+        "description": "NotebookWindow.DrawTabBar"
+    },
+    "Categories": {
+        "message": "カテゴリ",
+        "description": "NotebookWindow.DrawTabBar"
+    },
+    "DeleteNote": {
+        "message": "メモを削除",
+        "description": "NotebookWindow.DrawNoteEntry"
+    },
+    "CategorySelection": {
+        "message": "カテゴリ選択",
+        "description": "NotebookWindow.CategorySelectionWindow"
+    },
+    "NoCategoriesToChoose": {
+        "message": "選択できるカテゴリがありません。",
+        "description": "NotebookWindow.CategorySelectionWindow"
+    },
+    "ViewNotes": {
+        "message": "メモを表示",
+        "description": "NotebookWindow.DrawCategoryEntry"
+    },
+    "EditCategory": {
+        "message": "カテゴリ編集",
+        "description": "NotebookWindow.DrawCategoryEntry"
+    },
+    "DeleteCategory": {
+        "message": "カテゴリ削除",
+        "description": "NotebookWindow.DrawCategoryEntry"
+    },
+    "Title": {
+        "message": "タイトル",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "EditorContextMenu": {
+        "message": "コンテキストメニューの表示",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "MinimalView": {
+        "message": "最小表示",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "EndMinimalView": {
+        "message": "最小表示を終了",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "HideBackground": {
+        "message": "背景を非表示",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "ShowBackground": {
+        "message": "背景を表示",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "ShowEditorTransparencySlider": {
+        "message": "エディタの透明度スライダーを表示",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "HideEditorTransparencySlider": {
+        "message": "エディタの透明度スライダーを非表示",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "TransparencySlider": {
+        "message": "透明度スライダー",
+        "description": "NotebookWindow.DrawTransparencySlider"
+    },
+    "Settings": {
+        "message": "NeatNoter 設定",
+        "description": "SettingsWindow..ctor"
+    },
+    "Search": {
+        "message": "検索",
+        "description": "SettingsWindow.DrawSearch"
+    },
+    "IncludeNoteContents": {
+        "message": "メモの内容を含める",
+        "description": "SettingsWindow.DrawSearch"
+    },
+    "Backup": {
+        "message": "バックアップ",
+        "description": "SettingsWindow.DrawBackup"
+    },
+    "Export": {
+        "message": "エクスポート",
+        "description": "SettingsWindow.DrawBackup"
+    },
+    "Import": {
+        "message": "インポート",
+        "description": "SettingsWindow.DrawBackup"
+    },
+    "SecondaryBackupDirectoryPath": {
+        "message": "バックアップ ディレクトリを表示",
+        "description": "SettingsWindow.DrawBackup"
+    },
+    "Browse": {
+        "message": "参照",
+        "description": "SettingsWindow.DrawBackup"
+    }
+}
