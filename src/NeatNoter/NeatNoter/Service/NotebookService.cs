@@ -87,11 +87,19 @@ namespace NeatNoter
         public void SaveNotebook()
         {
             if (this.saveInProgress) return;
-            this.saveInProgress = true;
-            this.SaveNotes();
-            this.SaveCategories();
-            this.plugin.SaveConfig();
-            this.plugin.NotebookService.SaveBackup(this.plugin.Configuration.AutomaticExportPath);
+            try
+            {
+                this.saveInProgress = true;
+                this.SaveNotes();
+                this.SaveCategories();
+                this.plugin.SaveConfig();
+                this.plugin.NotebookService.SaveBackup(this.plugin.Configuration.AutomaticExportPath);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Failed to save notes.");
+            }
+
             this.saveInProgress = false;
         }
 
@@ -592,7 +600,7 @@ namespace NeatNoter
         {
             this.saveTimer.Stop();
             this.saveTimer.Elapsed -= this.SaveTimerOnElapsed;
-            this.SaveNotes();
+            this.SaveNotebook();
         }
 
         private static List<T> SortByName<T>(IEnumerable<T> documents, SortDirection direction) where T : UniqueDocument

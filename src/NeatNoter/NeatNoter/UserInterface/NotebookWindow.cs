@@ -78,6 +78,7 @@ namespace NeatNoter
         /// <inheritdoc />
         public override void OnClose()
         {
+            this.plugin.NotebookService.SaveNotebook();
             this.plugin.Configuration.IsVisible = false;
             this.plugin.SaveConfig();
         }
