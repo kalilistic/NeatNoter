@@ -1,1 +1,154 @@
-{}
+{
+    "NameAscending": {
+        "message": "Nome (Ascendente)",
+        "description": "DocumentSortType..cctor"
+    },
+    "NameDescending": {
+        "message": "Nome (Descendente)",
+        "description": "DocumentSortType..cctor"
+    },
+    "CreatedAscending": {
+        "message": "Criado (Ascendente)",
+        "description": "DocumentSortType..cctor"
+    },
+    "CreatedDescending": {
+        "message": "Criado (Descendente)",
+        "description": "DocumentSortType..cctor"
+    },
+    "ModifiedAscending": {
+        "message": "Modificado (Ascendente)",
+        "description": "DocumentSortType..cctor"
+    },
+    "ModifiedDescending": {
+        "message": "Modificado (Descendente)",
+        "description": "DocumentSortType..cctor"
+    },
+    "DefaultNoteName": {
+        "message": "Nova Nota",
+        "description": "NotebookService.CreateNote"
+    },
+    "DefaultCategoryName": {
+        "message": "Nova Categoria",
+        "description": "NotebookService.CreateCategory"
+    },
+    "DefaultCategoryBody": {
+        "message": "Descrição da categoria",
+        "description": "NotebookService.CreateCategory"
+    },
+    "DeleteConfirmationHeader": {
+        "message": "Confirmação de Exclusão do NeatNoter",
+        "description": "NotebookWindow.DrawDeletionConfirmationWindow"
+    },
+    "DeleteConfirmationSubHeader": {
+        "message": "Você tem certeza de que quer excluir isso?",
+        "description": "NotebookWindow.DrawDeletionConfirmationWindow"
+    },
+    "DeleteConfirmationWarning": {
+        "message": "Isto não pode ser desfeito.",
+        "description": "NotebookWindow.DrawDeletionConfirmationWindow"
+    },
+    "Yes": {
+        "message": "Sim",
+        "description": "NotebookWindow.DrawDeletionConfirmationWindow"
+    },
+    "No": {
+        "message": "Não",
+        "description": "NotebookWindow.DrawDeletionConfirmationWindow"
+    },
+    "NewNote": {
+        "message": "Nova Nota",
+        "description": "NotebookWindow.DrawNoteIndex"
+    },
+    "SortNotes": {
+        "message": "Ordenar",
+        "description": "NotebookWindow.DrawNoteIndex"
+    },
+    "FilterNotes": {
+        "message": "Filtro",
+        "description": "NotebookWindow.DrawNoteIndex"
+    },
+    "NoCategory": {
+        "message": "Sem Categoria",
+        "description": "NotebookWindow.DrawNoteIndex"
+    },
+    "NewCategory": {
+        "message": "Nova Categoria",
+        "description": "NotebookWindow.DrawCategoryIndex"
+    },
+    "SortCategories": {
+        "message": "Ordenar",
+        "description": "NotebookWindow.DrawCategoryIndex"
+    },
+    "Back": {
+        "message": "Anterior",
+        "description": "NotebookWindow.DrawNoteEditTool"
+    },
+    "ChooseCategories": {
+        "message": "Escolher categorias",
+        "description": "NotebookWindow.DrawNoteEditTool"
+    },
+    "CloseCategorySelection": {
+        "message": "Fechar seleção de categoria",
+        "description": "NotebookWindow.DrawNoteEditTool"
+    },
+    "Color": {
+        "message": "Cor",
+        "description": "NotebookWindow.DrawCategoryEditTool"
+    },
+    "Notes": {
+        "message": "Notas",
+        "description": "NotebookWindow.DrawTabBar"
+    },
+    "Categories": {
+        "message": "Categorias",
+        "description": "NotebookWindow.DrawTabBar"
+    },
+    "DeleteNote": {
+        "message": "Excluir Nota",
+        "description": "NotebookWindow.DrawNoteEntry"
+    },
+    "CategorySelection": {
+        "message": "Selecionar Categoria",
+        "description": "NotebookWindow.CategorySelectionWindow"
+    },
+    "NoCategoriesToChoose": {
+        "message": "Não há categorias para escolher.",
+        "description": "NotebookWindow.CategorySelectionWindow"
+    },
+    "ViewNotes": {
+        "message": "Ver Notas",
+        "description": "NotebookWindow.DrawCategoryEntry"
+    },
+    "EditCategory": {
+        "message": "Editar Categoria",
+        "description": "NotebookWindow.DrawCategoryEntry"
+    },
+    "DeleteCategory": {
+        "message": "Excluir Categoria",
+        "description": "NotebookWindow.DrawCategoryEntry"
+    },
+    "Title": {
+        "message": "Título",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "EditorContextMenu": {
+        "message": "Menu de Contexto do Editor",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "MinimalView": {
+        "message": "Visualização mínima",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "EndMinimalView": {
+        "message": "Terminar visualização mínima",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "HideBackground": {
+        "message": "Ocultar fundo",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "ShowBackground": {
+        "message": "Mostrar fundo",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    }
+}
