@@ -22,7 +22,7 @@ namespace NeatNoter
         {
             this.plugin = plugin;
             this.RespectCloseHotkey = true;
-            this.Size = new Vector2(300f, 380f);
+            this.Size = new Vector2(300f, 450f);
             this.SizeCondition = ImGuiCond.Appearing;
         }
 
@@ -30,6 +30,7 @@ namespace NeatNoter
         public override void Draw()
         {
             this.SaveFrequency();
+            this.DrawDisplay();
             this.DrawSearch();
             this.DrawBackup();
         }
@@ -62,6 +63,23 @@ namespace NeatNoter
             ImGui.Spacing();
         }
 
+        private void DrawDisplay()
+        {
+            ImGui.TextColored(ImGuiColors.DalamudViolet, Loc.Localize("Display", "Display"));
+            ImGui.BeginChild("###Display", new Vector2(-1, 40f), true);
+            {
+                var showContentPreview = this.plugin.Configuration.ShowContentPreview;
+                if (ImGui.Checkbox(Loc.Localize("ShowContentPreview", "Show content preview"), ref showContentPreview))
+                {
+                    this.plugin.Configuration.ShowContentPreview = showContentPreview;
+                    this.plugin.SaveConfig();
+                }
+            }
+
+            ImGui.EndChild();
+            ImGui.Spacing();
+        }
+
         private void DrawSearch()
         {
             ImGui.TextColored(ImGuiColors.DalamudViolet, Loc.Localize("Search", "Search"));
@@ -71,6 +89,7 @@ namespace NeatNoter
                 if (ImGui.Checkbox(Loc.Localize("IncludeNoteContents", "Include note contents"), ref includeBodies))
                 {
                     this.plugin.Configuration.IncludeNoteBodiesInSearch = includeBodies;
+                    this.plugin.SaveConfig();
                 }
             }
 

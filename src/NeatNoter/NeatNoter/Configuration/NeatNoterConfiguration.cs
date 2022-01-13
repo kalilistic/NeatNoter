@@ -87,5 +87,10 @@ namespace NeatNoter
         /// Gets or sets a value indicating whether notebook window is visible.
         /// </summary>
         public bool IsVisible { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to show content preview.
+        /// </summary>
+        public bool ShowContentPreview { get; set; } = true;
     }
 }

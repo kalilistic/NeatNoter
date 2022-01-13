@@ -420,9 +420,14 @@ namespace NeatNoter
 
             // Adding the text over manually because otherwise the text position is dependent on label length
             ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset - (ElementSizeX / 3.92f), (index * heightMod) + heightOffset + (4 * fontScale)), TextColor, buttonLabel);
-            ImGui.GetWindowDrawList().AddLine(windowPos + new Vector2(lineOffset, (index * heightMod) + heightOffset), windowPos + new Vector2(lineOffset, (index * heightMod) + heightOffset + (25 * fontScale)), TextColor);
 
-            var contentPreview = note.Body.Replace('\n', ' ');
+            var contentPreview = string.Empty;
+            if (this.plugin.Configuration.ShowContentPreview)
+            {
+                ImGui.GetWindowDrawList().AddLine(windowPos + new Vector2(lineOffset, (index * heightMod) + heightOffset), windowPos + new Vector2(lineOffset, (index * heightMod) + heightOffset + (25 * fontScale)), TextColor);
+                contentPreview = note.Body.Replace('\n', ' ');
+            }
+
             var cutBodyLength = Math.Min(note.Body.Length, 400);
             for (var i = 1; i < cutBodyLength && ImGui.CalcTextSize(contentPreview).X > ElementSizeX - lineOffset - (22 * fontScale); i++)
                 contentPreview = note.Body.Replace('\n', ' ')[.. (cutBodyLength - i)] + "...";
