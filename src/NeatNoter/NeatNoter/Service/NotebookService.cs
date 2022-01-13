@@ -90,6 +90,28 @@ namespace NeatNoter
         }
 
         /// <summary>
+        /// Update save frequency.
+        /// </summary>
+        /// <param name="frequency">new frequency.</param>
+        public void UpdateSaveFrequency(int frequency)
+        {
+            this.saveTimer.Stop();
+            this.saveTimer.Interval = frequency;
+            this.saveTimer.Start();
+        }
+
+        /// <summary>
+        /// Update full save frequency.
+        /// </summary>
+        /// <param name="frequency">new frequency.</param>
+        public void UpdateFullSaveFrequency(int frequency)
+        {
+            this.fullSaveTimer.Stop();
+            this.fullSaveTimer.Interval = frequency;
+            this.fullSaveTimer.Start();
+        }
+
+        /// <summary>
         /// Save notebook including notes, categories, and configuration.
         /// </summary>
         public void SaveFullNotebook()

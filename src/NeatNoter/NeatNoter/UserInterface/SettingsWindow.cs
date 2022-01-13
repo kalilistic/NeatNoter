@@ -22,15 +22,44 @@ namespace NeatNoter
         {
             this.plugin = plugin;
             this.RespectCloseHotkey = true;
-            this.Size = new Vector2(300f, 250f);
+            this.Size = new Vector2(300f, 380f);
             this.SizeCondition = ImGuiCond.Appearing;
         }
 
         /// <inheritdoc/>
         public override void Draw()
         {
+            this.SaveFrequency();
             this.DrawSearch();
             this.DrawBackup();
+        }
+
+        private void SaveFrequency()
+        {
+            ImGui.TextColored(ImGuiColors.DalamudViolet, Loc.Localize("Save", "Save Frequency"));
+            ImGui.BeginChild("###Save", new Vector2(-1, 110f), true);
+            {
+                ImGui.Text(Loc.Localize("SaveFrequency", "Save (seconds)"));
+                var saveFrequency = this.plugin.Configuration.SaveFrequency.FromMillisecondsToSeconds();
+                if (ImGui.SliderInt("###NeatNoter_SaveFrequency_Slider", ref saveFrequency, 1, 300))
+                {
+                    this.plugin.Configuration.SaveFrequency = saveFrequency.FromSecondsToMilliseconds();
+                    this.plugin.SaveConfig();
+                    this.plugin.NotebookService.UpdateSaveFrequency(this.plugin.Configuration.SaveFrequency);
+                }
+
+                ImGui.Text(Loc.Localize("FullSaveFrequency", "Full Save (hours)"));
+                var fullSaveFrequency = this.plugin.Configuration.FullSaveFrequency.FromMillisecondsToHours();
+                if (ImGui.SliderInt("###NeatNoter_FullSaveFrequency_Slider", ref fullSaveFrequency, 1, 12))
+                {
+                    this.plugin.Configuration.FullSaveFrequency = fullSaveFrequency.FromHoursToMilliseconds();
+                    this.plugin.SaveConfig();
+                    this.plugin.NotebookService.UpdateFullSaveFrequency(this.plugin.Configuration.FullSaveFrequency);
+                }
+            }
+
+            ImGui.EndChild();
+            ImGui.Spacing();
         }
 
         private void DrawSearch()
