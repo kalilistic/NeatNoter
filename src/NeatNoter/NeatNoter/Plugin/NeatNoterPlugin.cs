@@ -160,11 +160,11 @@ namespace NeatNoter
             {
                 if (disposing)
                 {
+                    this.WindowManager.Dispose();
                     this.backupTimer.Elapsed -= this.BackupTimerOnElapsed;
                     this.backupTimer.Dispose();
                     this.PluginCommandManager.Dispose();
                     PluginInterface.SavePluginConfig(this.Configuration);
-                    this.WindowManager.Dispose();
                     this.NotebookService.Dispose();
                     this.localization.Dispose();
                     PluginInterface.Dispose();
