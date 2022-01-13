@@ -1,27 +1,27 @@
 {
     "NameAscending": {
         "message": "Name (Ascending)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "NameDescending": {
         "message": "Name (Descending)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "CreatedAscending": {
         "message": "Created (Ascending)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "CreatedDescending": {
         "message": "Created (Descending)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "ModifiedAscending": {
         "message": "Modified (Ascending)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "ModifiedDescending": {
         "message": "Modified (Descending)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "DefaultNoteName": {
         "message": "New Note",
@@ -166,6 +166,26 @@
     "Settings": {
         "message": "NeatNoter Settings",
         "description": "SettingsWindow..ctor"
+    },
+    "Save": {
+        "message": "Save Frequency",
+        "description": "SettingsWindow.SaveFrequency"
+    },
+    "SaveFrequency": {
+        "message": "Save (seconds)",
+        "description": "SettingsWindow.SaveFrequency"
+    },
+    "FullSaveFrequency": {
+        "message": "Full Save (hours)",
+        "description": "SettingsWindow.SaveFrequency"
+    },
+    "Display": {
+        "message": "Display",
+        "description": "SettingsWindow.DrawDisplay"
+    },
+    "ShowContentPreview": {
+        "message": "Show content preview",
+        "description": "SettingsWindow.DrawDisplay"
     },
     "Search": {
         "message": "Search",
