@@ -167,7 +167,6 @@ namespace NeatNoter
                     PluginInterface.SavePluginConfig(this.Configuration);
                     this.NotebookService.Dispose();
                     this.localization.Dispose();
-                    PluginInterface.Dispose();
                 }
             }
             catch (Exception ex)
