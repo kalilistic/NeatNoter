@@ -1,27 +1,27 @@
 {
     "NameAscending": {
         "message": "Nombre (Ascendente)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "NameDescending": {
         "message": "Nombre (Descendente)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "CreatedAscending": {
         "message": "Creado (Ascendente)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "CreatedDescending": {
         "message": "Creado (Descendente)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "ModifiedAscending": {
         "message": "Modificado (Ascendente)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "ModifiedDescending": {
         "message": "Modificado (Descender)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "DefaultNoteName": {
         "message": "Nueva nota",

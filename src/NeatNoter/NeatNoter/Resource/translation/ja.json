@@ -1,27 +1,27 @@
 {
     "NameAscending": {
         "message": "名前 (昇順)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "NameDescending": {
         "message": "名前 (降順)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "CreatedAscending": {
         "message": "作成済み (昇順)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "CreatedDescending": {
         "message": "作成済み (降順)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "ModifiedAscending": {
         "message": "変更済み (昇順)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "ModifiedDescending": {
         "message": "変更済み (降順)",
-        "description": "DocumentSortType..cctor"
+        "description": "DocumentSortType.Init"
     },
     "DefaultNoteName": {
         "message": "新規メモ",
