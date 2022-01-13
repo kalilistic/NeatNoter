@@ -24,6 +24,7 @@ namespace NeatNoter
         private readonly object locker = new ();
         private readonly NeatNoterPlugin plugin;
         private readonly Timer saveTimer;
+        private readonly Timer fullSaveTimer;
         private List<Category> categories = null!;
         private List<Note> notes = null!;
         private bool saveInProgress;
@@ -42,7 +43,13 @@ namespace NeatNoter
                 Interval = this.plugin.Configuration.SaveFrequency,
                 Enabled = false,
             };
+            this.fullSaveTimer = new Timer
+            {
+                Interval = this.plugin.Configuration.FullSaveFrequency,
+                Enabled = false,
+            };
             this.saveTimer.Elapsed += this.SaveTimerOnElapsed;
+            this.fullSaveTimer.Elapsed += this.FullSaveTimerOnElapsed;
         }
 
         /// <summary>
@@ -79,12 +86,13 @@ namespace NeatNoter
         public void Start()
         {
             this.saveTimer.Enabled = true;
+            this.fullSaveTimer.Enabled = true;
         }
 
         /// <summary>
         /// Save notebook including notes, categories, and configuration.
         /// </summary>
-        public void SaveNotebook()
+        public void SaveFullNotebook()
         {
             if (this.saveInProgress) return;
             try
@@ -601,7 +609,9 @@ namespace NeatNoter
         {
             this.saveTimer.Stop();
             this.saveTimer.Elapsed -= this.SaveTimerOnElapsed;
-            this.SaveNotebook();
+            this.fullSaveTimer.Stop();
+            this.fullSaveTimer.Elapsed -= this.FullSaveTimerOnElapsed;
+            this.SaveFullNotebook();
         }
 
         private static List<T> SortByName<T>(IEnumerable<T> documents, SortDirection direction) where T : UniqueDocument
@@ -633,8 +643,18 @@ namespace NeatNoter
 
         private void SaveTimerOnElapsed(object sender, ElapsedEventArgs e)
         {
+            var currentNote = this.plugin.WindowManager.NotebookWindow!.CurrentNote;
             if (this.plugin.WindowManager.NotebookWindow is not { IsOpen: true }) return;
-            this.SaveNotebook();
+            if (this.plugin.WindowManager.NotebookWindow.IsNoteDirty && currentNote != null)
+            {
+                this.plugin.WindowManager.NotebookWindow.IsNoteDirty = false;
+                this.SaveNote(currentNote);
+            }
+        }
+
+        private void FullSaveTimerOnElapsed(object sender, ElapsedEventArgs e)
+        {
+            this.SaveFullNotebook();
         }
     }
 }

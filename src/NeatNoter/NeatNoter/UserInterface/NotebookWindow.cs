@@ -14,6 +14,21 @@ namespace NeatNoter
     /// </summary>
     public class NotebookWindow : PluginWindow
     {
+        /// <summary>
+        /// Currently selected note.
+        /// </summary>
+        public Note? CurrentNote;
+
+        /// <summary>
+        /// Indicator if note has changed since last save.
+        /// </summary>
+        public bool IsNoteDirty;
+
+        /// <summary>
+        /// Currently selected category.
+        /// </summary>
+        public Category? CurrentCategory;
+
         private const int MaxNoteSize = 1024 * 4196; // You can fit the complete works of Shakespeare in 3.5MB, so this is probably fine.
         private static readonly uint TextColor = ImGui.GetColorU32(ImGuiCol.Text);
 
@@ -23,8 +38,6 @@ namespace NeatNoter
         private bool minimalView;
         private bool transparencyWindowVisible;
         private float editorTransparency;
-        private Category? currentCategory;
-        private Note? currentNote;
         private string noteSearchEntry;
         private UIState lastState;
         private UIState state;
@@ -78,7 +91,7 @@ namespace NeatNoter
         /// <inheritdoc />
         public override void OnClose()
         {
-            this.plugin.NotebookService.SaveNotebook();
+            this.plugin.NotebookService.SaveFullNotebook();
             this.plugin.Configuration.IsVisible = false;
             this.plugin.SaveConfig();
         }
@@ -152,10 +165,10 @@ namespace NeatNoter
         {
             if (DrawDeletionConfirmationWindow(ref this.deletionWindowVisible))
             {
-                if (this.currentNote != null)
+                if (this.CurrentNote != null)
                 {
-                    this.plugin.NotebookService.DeleteNote(this.currentNote);
-                    this.currentNote = null;
+                    this.plugin.NotebookService.DeleteNote(this.CurrentNote);
+                    this.CurrentNote = null;
                 }
             }
 
@@ -163,8 +176,8 @@ namespace NeatNoter
 
             if (ImGui.Button(Loc.Localize("NewNote", "New Note") + "###NeatNoter_Notes_New"))
             {
-                this.currentNote = this.plugin.NotebookService.CreateNote();
-                this.plugin.NotebookService.SaveNote(this.currentNote);
+                this.CurrentNote = this.plugin.NotebookService.CreateNote();
+                this.plugin.NotebookService.SaveNote(this.CurrentNote);
                 this.plugin.NotebookService.SortNotes(DocumentSortType.GetDocumentSortTypeByIndex(this.plugin.Configuration.NoteSortType));
                 this.SetState(UIState.NoteEdit);
                 return;
@@ -251,10 +264,10 @@ namespace NeatNoter
         {
             if (DrawDeletionConfirmationWindow(ref this.deletionWindowVisible))
             {
-                if (this.currentCategory != null)
+                if (this.CurrentCategory != null)
                 {
-                    this.plugin.NotebookService.DeleteCategory(this.currentCategory);
-                    this.currentCategory = null;
+                    this.plugin.NotebookService.DeleteCategory(this.CurrentCategory);
+                    this.CurrentCategory = null;
                 }
             }
 
@@ -262,7 +275,7 @@ namespace NeatNoter
 
             if (ImGui.Button(Loc.Localize("NewCategory", "New Category") + "###NeatNoter_Categories_New"))
             {
-                this.currentCategory = this.plugin.NotebookService.CreateCategory();
+                this.CurrentCategory = this.plugin.NotebookService.CreateCategory();
                 this.SetState(UIState.CategoryEdit);
                 return;
             }
@@ -329,10 +342,10 @@ namespace NeatNoter
                     this.categoryWindowVisible ? Loc.Localize("CloseCategorySelection", "Close category selection") : Loc.Localize("ChooseCategories", "Choose categories"),
                     new Vector2(ElementSizeX - (60 * ImGui.GetIO().FontGlobalScale), 23 * ImGui.GetIO().FontGlobalScale)))
                     this.categoryWindowVisible = !this.categoryWindowVisible;
-                this.CategorySelectionWindow(this.currentNote?.Categories);
+                this.CategorySelectionWindow(this.CurrentNote?.Categories);
             }
 
-            this.DrawDocumentEditor(this.currentNote);
+            this.DrawDocumentEditor(this.CurrentNote);
         }
 
         private void DrawCategoryEditTool()
@@ -343,15 +356,15 @@ namespace NeatNoter
                     this.SetState(this.lastState);
 
                 ImGui.SameLine();
-                var color = this.currentCategory!.Color;
+                var color = this.CurrentCategory!.Color;
                 if (ImGui.ColorEdit3(Loc.Localize("Color", "Color"), ref color))
                 {
-                    this.currentCategory.Color = color;
-                    this.plugin.NotebookService.SaveCategory(this.currentCategory);
+                    this.CurrentCategory.Color = color;
+                    this.plugin.NotebookService.SaveCategory(this.CurrentCategory);
                 }
             }
 
-            this.DrawDocumentEditor(this.currentCategory);
+            this.DrawDocumentEditor(this.CurrentCategory);
         }
 
         private void DrawTabBar()
@@ -420,7 +433,7 @@ namespace NeatNoter
             {
                 if (ImGui.Selectable(Loc.Localize("DeleteNote", "Delete Note")))
                 {
-                    this.currentNote = note;
+                    this.CurrentNote = note;
                     this.deletionWindowVisible = true;
                 }
 
@@ -430,7 +443,7 @@ namespace NeatNoter
 
         private void OpenNote(Note note)
         {
-            this.currentNote = note;
+            this.CurrentNote = note;
             this.SetState(UIState.NoteEdit);
         }
 
@@ -516,7 +529,7 @@ namespace NeatNoter
                 if (ImGui.Selectable(Loc.Localize("DeleteCategory", "Delete Category")))
                 {
                     this.deletionWindowVisible = true;
-                    this.currentCategory = category;
+                    this.CurrentCategory = category;
                 }
 
                 ImGui.EndPopup();
@@ -525,7 +538,7 @@ namespace NeatNoter
 
         private void OpenCategory(Category category)
         {
-            this.currentCategory = category;
+            this.CurrentCategory = category;
             this.SetState(UIState.CategoryEdit);
         }
 
@@ -540,6 +553,7 @@ namespace NeatNoter
                 {
                     document!.Name = title;
                     document.Modified = DateUtil.CurrentTime();
+                    this.IsNoteDirty = true;
                 }
             }
 
@@ -565,6 +579,7 @@ namespace NeatNoter
                 {
                     document.Body = body;
                     document.Modified = DateUtil.CurrentTime();
+                    this.IsNoteDirty = true;
                 }
             }
 
@@ -574,6 +589,7 @@ namespace NeatNoter
                 {
                     document.Body = this.previousNote;
                     document.Modified = DateUtil.CurrentTime();
+                    this.IsNoteDirty = true;
                 }
             }
 

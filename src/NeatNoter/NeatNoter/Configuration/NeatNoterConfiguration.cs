@@ -32,6 +32,11 @@ namespace NeatNoter
         public int SaveFrequency { get; set; } = 5000;
 
         /// <summary>
+        /// Gets or sets save frequency in ms to perform full backup.
+        /// </summary>
+        public int FullSaveFrequency { get; set; } = 14400000;
+
+        /// <summary>
         /// Gets or sets a value indicating whether no category notes are selected.
         /// </summary>
         public bool IsNoCategorySelected { get; set; } = true;
