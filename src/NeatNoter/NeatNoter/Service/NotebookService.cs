@@ -522,6 +522,7 @@ namespace NeatNoter
         /// <param name="path">file path.</param>
         public void SaveBackup(string? path)
         {
+            if (string.IsNullOrEmpty(path)) return;
             lock (this.locker)
             {
                 dynamic obj = new ExpandoObject();
