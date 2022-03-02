@@ -66,12 +66,24 @@ namespace NeatNoter
         private void DrawDisplay()
         {
             ImGui.TextColored(ImGuiColors.DalamudViolet, Loc.Localize("Display", "Display"));
-            ImGui.BeginChild("###Display", new Vector2(-1, 40f), true);
+            ImGui.BeginChild("###Display", new Vector2(-1, 95f), true);
             {
                 var showContentPreview = this.plugin.Configuration.ShowContentPreview;
                 if (ImGui.Checkbox(Loc.Localize("ShowContentPreview", "Show content preview"), ref showContentPreview))
                 {
                     this.plugin.Configuration.ShowContentPreview = showContentPreview;
+                    this.plugin.SaveConfig();
+                }
+                var lockPosition = this.plugin.Configuration.LockPosition;
+                if (ImGui.Checkbox(Loc.Localize("LockPosition", "Lock position"), ref lockPosition))
+                {
+                    this.plugin.Configuration.LockPosition = lockPosition;
+                    this.plugin.SaveConfig();
+                }
+                var lockSize = this.plugin.Configuration.LockSize;
+                if (ImGui.Checkbox(Loc.Localize("LockSize", "Lock resize"), ref lockSize))
+                {
+                    this.plugin.Configuration.LockSize = lockSize;
                     this.plugin.SaveConfig();
                 }
             }

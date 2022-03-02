@@ -158,6 +158,16 @@ namespace NeatNoter
                 flags |= ImGuiWindowFlags.NoTitleBar;
             }
 
+            if (this.plugin.Configuration.LockSize)
+            {
+                flags |= ImGuiWindowFlags.NoResize;
+            }
+
+            if (this.plugin.Configuration.LockPosition)
+            {
+                flags |= ImGuiWindowFlags.NoMove;
+            }
+
             this.Flags = flags;
         }
 

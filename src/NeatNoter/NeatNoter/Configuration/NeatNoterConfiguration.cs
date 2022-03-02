@@ -27,6 +27,16 @@ namespace NeatNoter
         public string? AutomaticExportPath { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the window is locked in place.
+        /// </summary>
+        public bool LockPosition { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the window can be resized.
+        /// </summary>
+        public bool LockSize { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets save frequency in ms.
         /// </summary>
         public int SaveFrequency { get; set; } = 5000;
