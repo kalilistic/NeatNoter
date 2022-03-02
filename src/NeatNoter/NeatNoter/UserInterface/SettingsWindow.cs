@@ -22,7 +22,7 @@ namespace NeatNoter
         {
             this.plugin = plugin;
             this.RespectCloseHotkey = true;
-            this.Size = new Vector2(300f, 450f);
+            this.Size = new Vector2(300f, 520f);
             this.SizeCondition = ImGuiCond.Appearing;
         }
 
@@ -74,12 +74,14 @@ namespace NeatNoter
                     this.plugin.Configuration.ShowContentPreview = showContentPreview;
                     this.plugin.SaveConfig();
                 }
+
                 var lockPosition = this.plugin.Configuration.LockPosition;
                 if (ImGui.Checkbox(Loc.Localize("LockPosition", "Lock position"), ref lockPosition))
                 {
                     this.plugin.Configuration.LockPosition = lockPosition;
                     this.plugin.SaveConfig();
                 }
+
                 var lockSize = this.plugin.Configuration.LockSize;
                 if (ImGui.Checkbox(Loc.Localize("LockSize", "Lock resize"), ref lockSize))
                 {

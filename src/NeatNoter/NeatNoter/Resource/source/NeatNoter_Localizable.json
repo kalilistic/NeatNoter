@@ -187,6 +187,14 @@
         "message": "Show content preview",
         "description": "SettingsWindow.DrawDisplay"
     },
+    "LockPosition": {
+        "message": "Lock position",
+        "description": "SettingsWindow.DrawDisplay"
+    },
+    "LockSize": {
+        "message": "Lock resize",
+        "description": "SettingsWindow.DrawDisplay"
+    },
     "Search": {
         "message": "Search",
         "description": "SettingsWindow.DrawSearch"
