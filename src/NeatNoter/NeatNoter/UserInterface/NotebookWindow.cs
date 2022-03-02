@@ -415,9 +415,13 @@ namespace NeatNoter
             ImGui.PushStyleColor(ImGuiCol.Button, color);
 
             var buttonLabel = note.Name;
-            var cutNameLength = Math.Min(note.Name.Length, 70);
-            for (var i = 1; i < cutNameLength && ImGui.CalcTextSize(buttonLabel).X > lineOffset - (30 * fontScale); i++)
-                buttonLabel = note.Name[.. (cutNameLength - i)] + "...";
+            if (this.plugin.Configuration.ShowContentPreview)
+            {
+                var cutNameLength = Math.Min(note.Name.Length, 70);
+                for (var i = 1; i < cutNameLength && ImGui.CalcTextSize(buttonLabel).X > lineOffset - (30 * fontScale); i++)
+                    buttonLabel = note.Name[.. (cutNameLength - i)] + "...";
+            }
+
             if (ImGui.Button(note.IdentifierString, new Vector2(ElementSizeX, 25 * fontScale)) && !this.plugin.NotebookService.Loading)
             {
                 this.OpenNote(note);
