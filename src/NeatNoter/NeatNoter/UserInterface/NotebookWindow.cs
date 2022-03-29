@@ -37,6 +37,7 @@ namespace NeatNoter
         private bool backgroundVisible;
         private bool minimalView;
         private bool transparencyWindowVisible;
+        private bool textEditable;
         private float editorTransparency;
         private string noteSearchEntry;
         private UIState lastState;
@@ -56,6 +57,7 @@ namespace NeatNoter
             this.state = UIState.NoteIndex;
             this.noteSearchEntry = string.Empty;
             this.backgroundVisible = true;
+            this.textEditable = true;
             this.Size = new Vector2(400, 600) * ImGui.GetIO().FontGlobalScale;
             this.SizeCondition = ImGuiCond.FirstUseEver;
             this.previousNote = string.Empty;
@@ -583,6 +585,8 @@ namespace NeatNoter
 
             var body = document?.Body;
             var inputFlags = ImGuiInputTextFlags.AllowTabInput;
+            if (!this.textEditable)
+                inputFlags |= ImGuiInputTextFlags.ReadOnly;
 
             Vector4 color;
             unsafe
@@ -592,6 +596,9 @@ namespace NeatNoter
             }
 
             ImGui.PushStyleColor(ImGuiCol.FrameBg, color);
+
+            if (!this.textEditable) ImGui.GetIO().WantTextInput = false;
+
             if (ImGui.InputTextMultiline(string.Empty, ref body, MaxNoteSize, new Vector2(ElementSizeX - (16 * ImGui.GetIO().FontGlobalScale), WindowSizeY - (this.minimalView ? 40 : 94)), inputFlags))
             {
                 if (document != null)
@@ -633,6 +640,15 @@ namespace NeatNoter
             else if (!this.backgroundVisible && ImGui.Selectable(Loc.Localize("ShowBackground", "Show background")))
             {
                 this.backgroundVisible = true;
+            }
+
+            if (this.textEditable && ImGui.Selectable(Loc.Localize("TextEditDisable", "Disable text editing")))
+            {
+                this.textEditable = false;
+            }
+            else if (!this.textEditable && ImGui.Selectable(Loc.Localize("TextEditEnable", "Enable text editing")))
+            {
+                this.textEditable = true;
             }
 
             if (!this.transparencyWindowVisible && ImGui.Selectable(Loc.Localize("ShowEditorTransparencySlider", "Show editor transparency slider")))
