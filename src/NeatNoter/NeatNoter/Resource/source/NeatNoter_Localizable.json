@@ -151,6 +151,14 @@
         "message": "Show background",
         "description": "NotebookWindow.DrawDocumentEditor"
     },
+    "TextEditDisable": {
+        "message": "Disable text editing",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
+    "TextEditEnable": {
+        "message": "Enable text editing",
+        "description": "NotebookWindow.DrawDocumentEditor"
+    },
     "ShowEditorTransparencySlider": {
         "message": "Show editor transparency slider",
         "description": "NotebookWindow.DrawDocumentEditor"
