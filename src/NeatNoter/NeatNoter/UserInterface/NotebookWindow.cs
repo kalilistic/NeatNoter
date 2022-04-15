@@ -5,6 +5,7 @@ using System.Numerics;
 
 using CheapLoc;
 using Dalamud.DrunkenToad;
+using Dalamud.Interface;
 using ImGuiNET;
 
 namespace NeatNoter
@@ -129,6 +130,7 @@ namespace NeatNoter
 
             var ret = false;
 
+            ImGui.SetNextWindowSize(ImGuiHelpers.ScaledVector2(280f, 120f));
             ImGui.Begin(Loc.Localize("DeleteConfirmationHeader", "NeatNoter Deletion Confirmation"), ImGuiWindowFlags.NoResize);
 
             ImGui.Text(Loc.Localize("DeleteConfirmationSubHeader", "Are you sure you want to delete this?"));
