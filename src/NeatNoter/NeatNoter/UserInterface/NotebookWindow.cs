@@ -408,7 +408,6 @@ namespace NeatNoter
         {
             var fontScale = ImGui.GetFontSize();
             var heightMod = fontScale + ImGui.GetStyle().FramePadding.Y;
-            var offset = (heightMod / 2) + (ImGui.GetStyle().ItemSpacing.Y * 1.5f);
             heightOffset += ImGui.GetStyle().ItemSpacing.Y;
             heightOffset -= ImGui.GetScrollY();
 
@@ -518,7 +517,6 @@ namespace NeatNoter
         {
             var fontScale = ImGui.GetFontSize();
             var heightMod = fontScale + ImGui.GetStyle().FramePadding.Y;
-            var offset = (heightMod / 2) + (ImGui.GetStyle().ItemSpacing.Y * 1.5f);
             heightOffset += ImGui.GetStyle().ItemSpacing.Y;
             heightOffset -= ImGui.GetScrollY() * fontScale;
 
