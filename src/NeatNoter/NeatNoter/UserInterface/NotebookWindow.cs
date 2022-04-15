@@ -197,7 +197,7 @@ namespace NeatNoter
                 return;
             }
 
-            var fontScale = ImGui.GetIO().FontGlobalScale;
+            var fontScale = ImGui.GetFontSize();
 
             ImGui.SameLine();
             if (ImGui.Button(Loc.Localize("SortNotes", "Sort") + "###NeatNoter_Notes_Sort"))
@@ -270,7 +270,7 @@ namespace NeatNoter
             var notes = this.plugin.NotebookService.GetNotes(true, this.noteSearchEntry).Where(note => note.IsVisible).ToList();
             for (var i = 0; i < notes.Count; i++)
             {
-                this.DrawNoteEntry(notes[i], i, 38 + (51 * fontScale));
+                this.DrawNoteEntry(notes[i], i, ImGui.GetStyle().WindowPadding.Y + ((ImGui.GetStyle().FramePadding.Y * 2) * 3) + (fontScale * 3) + (ImGui.GetStyle().ItemSpacing.Y * 2));
             }
         }
 
@@ -294,7 +294,7 @@ namespace NeatNoter
                 return;
             }
 
-            var fontScale = ImGui.GetIO().FontGlobalScale;
+            var fontScale = ImGui.GetFontSize();
 
             ImGui.SameLine();
             if (ImGui.Button(Loc.Localize("SortCategories", "Sort") + "###NeatNoter_Categories_Sort"))
@@ -337,7 +337,7 @@ namespace NeatNoter
             var categories = this.plugin.NotebookService.GetCategories();
             for (var i = 0; i < categories.Count; i++)
             {
-                this.DrawCategoryEntry(categories[i], i, 38 + (51 * fontScale));
+                this.DrawCategoryEntry(categories[i], i, ImGui.GetStyle().WindowPadding.Y + ((ImGui.GetStyle().FramePadding.Y * 2) * 3) + (fontScale * 3) + (ImGui.GetStyle().ItemSpacing.Y * 2));
             }
         }
 
@@ -406,8 +406,10 @@ namespace NeatNoter
 
         private void DrawNoteEntry(Note note, int index, float heightOffset)
         {
-            var fontScale = ImGui.GetIO().FontGlobalScale;
-            var heightMod = 4 + (25 * fontScale);
+            var fontScale = ImGui.GetFontSize();
+            var heightMod = fontScale + ImGui.GetStyle().FramePadding.Y;
+            var offset = (heightMod / 2) + (ImGui.GetStyle().ItemSpacing.Y * 1.5f);
+            heightOffset += ImGui.GetStyle().ItemSpacing.Y;
             heightOffset -= ImGui.GetScrollY();
 
             var lineOffset = ElementSizeX * 0.3f;
@@ -422,11 +424,11 @@ namespace NeatNoter
             if (this.plugin.Configuration.ShowContentPreview)
             {
                 var cutNameLength = Math.Min(note.Name.Length, 70);
-                for (var i = 1; i < cutNameLength && ImGui.CalcTextSize(buttonLabel).X > lineOffset - (30 * fontScale); i++)
+                for (var i = 1; i < cutNameLength && ImGui.CalcTextSize(buttonLabel).X > lineOffset - fontScale; i++)
                     buttonLabel = note.Name[.. (cutNameLength - i)] + "...";
             }
 
-            if (ImGui.Button(note.IdentifierString, new Vector2(ElementSizeX, 25 * fontScale)) && !this.plugin.NotebookService.Loading)
+            if (ImGui.Button(note.IdentifierString, new Vector2(ElementSizeX, heightMod)) && !this.plugin.NotebookService.Loading)
             {
                 this.OpenNote(note);
             }
@@ -436,21 +438,24 @@ namespace NeatNoter
 
             ImGui.PopStyleColor();
 
+            var calc = (index * (heightMod + ImGui.GetStyle().ItemSpacing.Y)) + heightOffset;
+            var calcFont = calc + (ImGui.GetStyle().FramePadding.Y / 2);
+
             // Adding the text over manually because otherwise the text position is dependent on label length
-            ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset - (ElementSizeX / 3.92f), (index * heightMod) + heightOffset + (4 * fontScale)), TextColor, buttonLabel);
+            ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset - (ElementSizeX / 3.92f), calcFont), TextColor, buttonLabel);
 
             var contentPreview = string.Empty;
             if (this.plugin.Configuration.ShowContentPreview)
             {
-                ImGui.GetWindowDrawList().AddLine(windowPos + new Vector2(lineOffset, (index * heightMod) + heightOffset), windowPos + new Vector2(lineOffset, (index * heightMod) + heightOffset + (25 * fontScale)), TextColor);
+                ImGui.GetWindowDrawList().AddLine(windowPos + new Vector2(lineOffset, calc), windowPos + new Vector2(lineOffset, calc + heightMod), TextColor);
                 contentPreview = note.Body.Replace('\n', ' ');
             }
 
             var cutBodyLength = Math.Min(note.Body.Length, 400);
-            for (var i = 1; i < cutBodyLength && ImGui.CalcTextSize(contentPreview).X > ElementSizeX - lineOffset - (22 * fontScale); i++)
+            for (var i = 1; i < cutBodyLength && ImGui.CalcTextSize(contentPreview).X > ElementSizeX - lineOffset - fontScale; i++)
                 contentPreview = note.Body.Replace('\n', ' ')[.. (cutBodyLength - i)] + "...";
             ImGui.GetWindowDrawList()
-                .AddText(windowPos + new Vector2(lineOffset + 10, (index * heightMod) + heightOffset + (4 * fontScale)), TextColor, contentPreview);
+                .AddText(windowPos + new Vector2(lineOffset + 10, calcFont), TextColor, contentPreview);
 
             if (ImGui.BeginPopupContextItem("###NeatNoter_" + note.IdentifierString))
             {
@@ -511,8 +516,10 @@ namespace NeatNoter
 
         private void DrawCategoryEntry(Category category, int index, float heightOffset)
         {
-            var fontScale = ImGui.GetIO().FontGlobalScale;
-            var heightMod = 4 + (25 * fontScale);
+            var fontScale = ImGui.GetFontSize();
+            var heightMod = fontScale + ImGui.GetStyle().FramePadding.Y;
+            var offset = (heightMod / 2) + (ImGui.GetStyle().ItemSpacing.Y * 1.5f);
+            heightOffset += ImGui.GetStyle().ItemSpacing.Y;
             heightOffset -= ImGui.GetScrollY() * fontScale;
 
             var color = new Vector4(category.Color, 0.5f);
@@ -522,7 +529,7 @@ namespace NeatNoter
             var cutNameLength = Math.Min(category.Name.Length, 70);
             for (var i = 1; i < cutNameLength && ImGui.CalcTextSize(buttonLabel).X > ElementSizeX - 22; i++)
                 buttonLabel = category.Name[.. (cutNameLength - i)] + "...";
-            if (ImGui.Button(category.IdentifierString, new Vector2(ElementSizeX, 25 * fontScale)) && !this.plugin.NotebookService.Loading)
+            if (ImGui.Button(category.IdentifierString, new Vector2(ElementSizeX, heightMod)) && !this.plugin.NotebookService.Loading)
             {
                 this.OpenCategory(category);
             }
@@ -532,7 +539,10 @@ namespace NeatNoter
 
             ImGui.PopStyleColor();
 
-            ImGui.GetWindowDrawList().AddText(ImGui.GetWindowPos() + new Vector2(ElementSizeX * 0.045f, (index * heightMod) + heightOffset + (4 * fontScale)), TextColor, buttonLabel);
+            var calc = (index * (heightMod + ImGui.GetStyle().ItemSpacing.Y)) + heightOffset;
+            var calcFont = calc + (ImGui.GetStyle().FramePadding.Y / 2);
+
+            ImGui.GetWindowDrawList().AddText(ImGui.GetWindowPos() + new Vector2(ElementSizeX * 0.045f, calcFont), TextColor, buttonLabel);
 
             if (ImGui.BeginPopupContextItem("##NeatNoter_" + category.IdentifierString))
             {
