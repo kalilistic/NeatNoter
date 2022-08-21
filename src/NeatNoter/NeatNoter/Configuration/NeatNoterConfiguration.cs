@@ -85,13 +85,13 @@ namespace NeatNoter
         /// Gets or sets notes.
         /// </summary>
         [Obsolete("Use DB now")]
-        public List<Note> Notes { get; set; } = new ();
+        public List<Note> Notes { get; set; } = new();
 
         /// <summary>
         /// Gets or sets categories.
         /// </summary>
         [Obsolete("Use DB now")]
-        public List<Category> Categories { get; set; } = new ();
+        public List<Category> Categories { get; set; } = new();
 
         /// <summary>
         /// Gets or sets a value indicating whether notebook window is visible.

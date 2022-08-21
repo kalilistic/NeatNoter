@@ -21,7 +21,7 @@ namespace NeatNoter
     /// </summary>
     public class NotebookService : BaseRepository
     {
-        private readonly object locker = new ();
+        private readonly object locker = new();
         private readonly NeatNoterPlugin plugin;
         private readonly Timer saveTimer;
         private readonly Timer fullSaveTimer;
@@ -663,7 +663,7 @@ namespace NeatNoter
             return docList;
         }
 
-        private void SaveTimerOnElapsed(object sender, ElapsedEventArgs e)
+        private void SaveTimerOnElapsed(object? sender, ElapsedEventArgs e)
         {
             var currentNote = this.plugin.WindowManager.NotebookWindow!.CurrentNote;
             if (this.plugin.WindowManager.NotebookWindow is not { IsOpen: true }) return;
@@ -674,7 +674,7 @@ namespace NeatNoter
             }
         }
 
-        private void FullSaveTimerOnElapsed(object sender, ElapsedEventArgs e)
+        private void FullSaveTimerOnElapsed(object? sender, ElapsedEventArgs e)
         {
             this.SaveFullNotebook();
         }

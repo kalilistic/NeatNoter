@@ -33,7 +33,7 @@ namespace NeatNoter
         /// </summary>
         [BsonIgnore]
         [JsonIgnore]
-        public string IdentifierString => this.InternalName[this.InternalName.LastIndexOf("##-", StringComparison.Ordinal) ..];
+        public string IdentifierString => this.InternalName[this.InternalName.LastIndexOf("##-", StringComparison.Ordinal)..];
 
         /// <summary>
         /// Gets or sets id.

@@ -424,7 +424,7 @@ namespace NeatNoter
             {
                 var cutNameLength = Math.Min(note.Name.Length, 70);
                 for (var i = 1; i < cutNameLength && ImGui.CalcTextSize(buttonLabel).X > lineOffset - fontScale; i++)
-                    buttonLabel = note.Name[.. (cutNameLength - i)] + "...";
+                    buttonLabel = note.Name[..(cutNameLength - i)] + "...";
             }
 
             if (ImGui.Button(note.IdentifierString, new Vector2(ElementSizeX, heightMod)) && !this.plugin.NotebookService.Loading)
@@ -452,7 +452,7 @@ namespace NeatNoter
 
             var cutBodyLength = Math.Min(note.Body.Length, 400);
             for (var i = 1; i < cutBodyLength && ImGui.CalcTextSize(contentPreview).X > ElementSizeX - lineOffset - fontScale; i++)
-                contentPreview = note.Body.Replace('\n', ' ')[.. (cutBodyLength - i)] + "...";
+                contentPreview = note.Body.Replace('\n', ' ')[..(cutBodyLength - i)] + "...";
             ImGui.GetWindowDrawList()
                 .AddText(windowPos + new Vector2(lineOffset + 10, calcFont), TextColor, contentPreview);
 
@@ -526,7 +526,7 @@ namespace NeatNoter
             var buttonLabel = category.Name;
             var cutNameLength = Math.Min(category.Name.Length, 70);
             for (var i = 1; i < cutNameLength && ImGui.CalcTextSize(buttonLabel).X > ElementSizeX - 22; i++)
-                buttonLabel = category.Name[.. (cutNameLength - i)] + "...";
+                buttonLabel = category.Name[..(cutNameLength - i)] + "...";
             if (ImGui.Button(category.IdentifierString, new Vector2(ElementSizeX, heightMod)) && !this.plugin.NotebookService.Loading)
             {
                 this.OpenCategory(category);
@@ -619,7 +619,7 @@ namespace NeatNoter
                 }
             }
 
-            if (ImGui.IsItemDeactivated() && ImGui.IsKeyPressed(ImGui.GetKeyIndex(ImGuiKey.Escape)))
+            if (ImGui.IsItemDeactivated() && ImGui.IsKeyPressed(ImGuiKey.Escape))
             {
                 if (document != null)
                 {

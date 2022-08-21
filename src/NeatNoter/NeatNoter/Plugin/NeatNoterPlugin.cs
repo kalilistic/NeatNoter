@@ -188,7 +188,7 @@ namespace NeatNoter
             this.SaveConfig();
         }
 
-        private void BackupTimerOnElapsed(object sender, ElapsedEventArgs? e)
+        private void BackupTimerOnElapsed(object? sender, ElapsedEventArgs? e)
         {
             if (DateUtil.CurrentTime() > this.Configuration.LastBackup + this.Configuration.BackupFrequency)
             {

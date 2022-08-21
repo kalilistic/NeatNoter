@@ -14,42 +14,42 @@ namespace NeatNoter
         /// <summary>
         /// List of available sort types.
         /// </summary>
-        public static readonly List<DocumentSortType> DocumentSortTypes = new ();
+        public static readonly List<DocumentSortType> DocumentSortTypes = new();
 
         /// <summary>
         /// List of available sort type names.
         /// </summary>
-        public static readonly List<string> DocumentSortTypeNames = new ();
+        public static readonly List<string> DocumentSortTypeNames = new();
 
         /// <summary>
         /// Sort Type: Name Ascending.
         /// </summary>
-        public static readonly DocumentSortType NameAscending = new (0, 0, Loc.Localize("NameAscending", "Name (Ascending)"));
+        public static readonly DocumentSortType NameAscending = new(0, 0, Loc.Localize("NameAscending", "Name (Ascending)"));
 
         /// <summary>
         /// Sort Type: Name Descending.
         /// </summary>
-        public static readonly DocumentSortType NameDescending = new (1, 1, Loc.Localize("NameDescending", "Name (Descending)"));
+        public static readonly DocumentSortType NameDescending = new(1, 1, Loc.Localize("NameDescending", "Name (Descending)"));
 
         /// <summary>
         /// Sort Type: Created Date Ascending.
         /// </summary>
-        public static readonly DocumentSortType CreatedAscending = new (2, 2, Loc.Localize("CreatedAscending", "Created (Ascending)"));
+        public static readonly DocumentSortType CreatedAscending = new(2, 2, Loc.Localize("CreatedAscending", "Created (Ascending)"));
 
         /// <summary>
         /// Sort Type: Created Date Descending.
         /// </summary>
-        public static readonly DocumentSortType CreatedDescending = new (3, 3, Loc.Localize("CreatedDescending", "Created (Descending)"));
+        public static readonly DocumentSortType CreatedDescending = new(3, 3, Loc.Localize("CreatedDescending", "Created (Descending)"));
 
         /// <summary>
         /// Sort Type: Modified Date Descending.
         /// </summary>
-        public static readonly DocumentSortType ModifiedAscending = new (4, 4, Loc.Localize("ModifiedAscending", "Modified (Ascending)"));
+        public static readonly DocumentSortType ModifiedAscending = new(4, 4, Loc.Localize("ModifiedAscending", "Modified (Ascending)"));
 
         /// <summary>
         /// Sort Type: Modified Date Descending.
         /// </summary>
-        public static readonly DocumentSortType ModifiedDescending = new (5, 5, Loc.Localize("ModifiedDescending", "Modified (Descending)"));
+        public static readonly DocumentSortType ModifiedDescending = new(5, 5, Loc.Localize("ModifiedDescending", "Modified (Descending)"));
 
         private DocumentSortType(int index, int code, string name)
         {
@@ -82,7 +82,7 @@ namespace NeatNoter
         /// <returns>sort type.</returns>
         public static DocumentSortType GetDocumentSortTypeByIndex(int index)
         {
-            return DocumentSortTypes.FirstOrDefault(view => view.Index == index) !;
+            return DocumentSortTypes.FirstOrDefault(view => view.Index == index)!;
         }
 
         /// <summary>
