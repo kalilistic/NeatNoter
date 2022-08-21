@@ -5,11 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Timers;
-using System.Windows.Forms;
 
 using CheapLoc;
 using Dalamud.DrunkenToad;
-using Dalamud.Logging;
 using Newtonsoft.Json;
 
 using Timer = System.Timers.Timer;
@@ -503,50 +501,6 @@ namespace NeatNoter
         }
 
         /// <summary>
-        /// Create backup.
-        /// </summary>
-        /// <param name="writeAutomaticPath">automatic path.</param>
-        public void CreateBackup(bool writeAutomaticPath = false)
-        {
-            if (this.Saving)
-                return;
-            this.Saving = true;
-
-            using var saveFileDialogue = new SaveFileDialog
-            {
-                Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-                AddExtension = true,
-                AutoUpgradeEnabled = true,
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                RestoreDirectory = true,
-                ShowHelp = true,
-            };
-            try
-            {
-                if (saveFileDialogue.ShowDialog(null) != DialogResult.OK)
-                {
-                    this.Saving = false;
-                    return;
-                }
-            }
-            catch (Exception e)
-            {
-                PluginLog.LogError(e, e.Message);
-                this.Saving = false;
-                return;
-            }
-
-            this.SaveBackup(saveFileDialogue.FileName);
-
-            if (writeAutomaticPath)
-            {
-                this.TempExportPath = saveFileDialogue.FileName;
-            }
-
-            this.Saving = false;
-        }
-
-        /// <summary>
         /// Save backup.
         /// </summary>
         /// <param name="path">file path.</param>
@@ -563,65 +517,6 @@ namespace NeatNoter
 
                 File.WriteAllText(path, JsonConvert.SerializeObject(obj));
             }
-        }
-
-        /// <summary>
-        /// Load backup.
-        /// </summary>
-        public void LoadBackup()
-        {
-            if (this.Loading)
-                return;
-            this.Loading = true;
-
-            using var openFileDialog = new OpenFileDialog
-            {
-                Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-                AddExtension = true,
-                AutoUpgradeEnabled = true,
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                RestoreDirectory = true,
-                ShowHelp = true,
-            };
-            try
-            {
-                if (openFileDialog.ShowDialog(null) != DialogResult.OK)
-                {
-                    this.Loading = false;
-                    return;
-                }
-            }
-            catch (Exception e)
-            {
-                PluginLog.LogError(e, e.Message);
-                this.Loading = false;
-                return;
-            }
-
-            lock (this.locker)
-            {
-                var json = File.ReadAllText(openFileDialog.FileName);
-                var importedBackup = JsonConvert.DeserializeObject<DocumentBackup>(json);
-                var importedNotes = importedBackup?.Notes;
-                var importedCategories = importedBackup?.Categories;
-                if (importedNotes != null)
-                {
-                    InitializeAll(importedNotes);
-                    this.SaveNotes(importedNotes);
-                }
-
-                if (importedCategories != null)
-                {
-                    InitializeAll(importedCategories);
-                    this.SaveCategories(importedCategories);
-                }
-
-                this.LoadDocuments();
-            }
-
-            this.Loading = false;
-
-            this.plugin.SaveConfig();
         }
 
         /// <summary>

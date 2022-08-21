@@ -1,5 +1,4 @@
 using System.Numerics;
-using System.Threading.Tasks;
 
 using CheapLoc;
 using Dalamud.DrunkenToad;
@@ -22,7 +21,7 @@ namespace NeatNoter
         {
             this.plugin = plugin;
             this.RespectCloseHotkey = true;
-            this.Size = new Vector2(300f, 520f);
+            this.Size = new Vector2(300f, 400f);
             this.SizeCondition = ImGuiCond.Appearing;
         }
 
@@ -32,7 +31,6 @@ namespace NeatNoter
             this.SaveFrequency();
             this.DrawDisplay();
             this.DrawSearch();
-            this.DrawBackup();
         }
 
         private void SaveFrequency()
@@ -109,50 +107,6 @@ namespace NeatNoter
 
             ImGui.EndChild();
             ImGui.Spacing();
-        }
-
-        private void DrawBackup()
-        {
-            ImGui.TextColored(ImGuiColors.DalamudViolet, Loc.Localize("Backup", "Backup"));
-            ImGui.BeginChild("###Backup", new Vector2(-1, 95f), true);
-            {
-                if (ImGui.Button(Loc.Localize("Export", "Export") + "###NeatNoter_Button_Export"))
-                {
-                    Task.Run(() => this.plugin.NotebookService.CreateBackup());
-                }
-
-                ImGui.SameLine();
-                if (ImGui.Button(Loc.Localize("Import", "Import") + "###NeatNoter_Button_Import"))
-                {
-                    Task.Run(() => this.plugin.NotebookService.LoadBackup());
-                }
-
-                ImGui.Spacing();
-                ImGui.Separator();
-
-                ImGui.Text(Loc.Localize("SecondaryBackupDirectoryPath", "Secondary Backup Directory"));
-                var existing = this.plugin.Configuration.AutomaticExportPath ?? string.Empty;
-                if (ImGui.InputText("####SecondaryBackupPath", ref existing, 350000))
-                {
-                    this.plugin.Configuration.AutomaticExportPath = existing;
-                    this.plugin.SaveConfig();
-                }
-
-                ImGui.SameLine();
-                if (ImGui.Button(Loc.Localize("Browse", "Browse")))
-                {
-                    Task.Run(() => this.plugin.NotebookService.CreateBackup(true));
-                }
-
-                if (this.plugin.NotebookService.TempExportPath != null)
-                {
-                    this.plugin.Configuration.AutomaticExportPath = this.plugin.NotebookService.TempExportPath;
-                    this.plugin.NotebookService.TempExportPath = null;
-                    this.plugin.SaveConfig();
-                }
-            }
-
-            ImGui.EndChild();
         }
     }
 }
