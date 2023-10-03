@@ -2,6 +2,7 @@ using System.Numerics;
 
 using CheapLoc;
 using Dalamud.DrunkenToad;
+using Dalamud.DrunkenToad.Extensions;
 using Dalamud.Interface.Colors;
 using ImGuiNET;
 

@@ -3,12 +3,16 @@ using System.Reflection;
 using System.Timers;
 
 using Dalamud.DrunkenToad;
+using Dalamud.DrunkenToad.Extensions;
+using Dalamud.DrunkenToad.Helpers;
 using Dalamud.Game.ClientState;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
 using Dalamud.IoC;
 using Dalamud.Logging;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
+using NeatNoter.Localization;
 
 namespace NeatNoter
 {
@@ -36,7 +40,7 @@ namespace NeatNoter
         public BackupManager BackupManager;
 
         private readonly Timer backupTimer;
-        private readonly Localization localization;
+        private readonly LegacyLoc localization;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NeatNoterPlugin"/> class.
@@ -51,13 +55,13 @@ namespace NeatNoter
             }
             catch (Exception ex)
             {
-                Logger.LogError("Failed to load config so creating new one.", ex);
+                PluginLog.Error("Failed to load config so creating new one.", ex);
                 this.Configuration = new NeatNoterConfiguration();
                 this.SaveConfig();
             }
 
             // load services
-            this.localization = new Localization(PluginInterface, CommandManager);
+            this.localization = new LegacyLoc(PluginInterface, CommandManager);
             this.BackupManager = new BackupManager(PluginInterface.GetPluginConfigDirectory());
             this.NotebookService = new NotebookService(this);
 
@@ -67,7 +71,7 @@ namespace NeatNoter
             var pluginVersion = Assembly.GetExecutingAssembly().VersionNumber();
             if (this.Configuration.PluginVersion < pluginVersion)
             {
-                Logger.LogInfo("Running backup since new version detected.");
+                PluginLog.Log("Running backup since new version detected.");
                 this.RunUpgradeBackup();
                 this.Configuration.PluginVersion = pluginVersion;
                 this.SaveConfig();
@@ -102,29 +106,26 @@ namespace NeatNoter
         /// </summary>
         [PluginService]
         [RequiredVersion("1.0")]
-        public static ChatGui Chat { get; private set; } = null!;
+        public static IChatGui Chat { get; private set; } = null!;
 
         /// <summary>
         /// Gets command manager.
         /// </summary>
         [PluginService]
         [RequiredVersion("1.0")]
-        public static CommandManager CommandManager { get; private set; } = null!;
+        public static ICommandManager CommandManager { get; private set; } = null!;
 
         /// <summary>
         /// Gets client state.
         /// </summary>
         [PluginService]
         [RequiredVersion("1.0")]
-        public static ClientState ClientState { get; private set; } = null!;
+        public static IClientState ClientState { get; private set; } = null!;
 
         /// <summary>
         /// Gets or sets command manager to handle user commands.
         /// </summary>
         public PluginCommandManager PluginCommandManager { get; set; } = null!;
-
-        /// <inheritdoc />
-        public string Name => "NeatNoter";
 
         /// <summary>
         /// Get plugin folder.
@@ -183,17 +184,16 @@ namespace NeatNoter
             }
 
             this.NotebookService.SetVersion(2);
-            Chat.PluginPrintNotice("NoteNoter has been installed! Type /notebook to open the notebook.");
             this.Configuration.JustInstalled = false;
             this.SaveConfig();
         }
 
         private void BackupTimerOnElapsed(object? sender, ElapsedEventArgs? e)
         {
-            if (DateUtil.CurrentTime() > this.Configuration.LastBackup + this.Configuration.BackupFrequency)
+            if (UnixTimestampHelper.CurrentTime() > this.Configuration.LastBackup + this.Configuration.BackupFrequency)
             {
-                Logger.LogInfo("Running backup due to frequency timer.");
-                this.Configuration.LastBackup = DateUtil.CurrentTime();
+                PluginLog.Log("Running backup due to frequency timer.");
+                this.Configuration.LastBackup = UnixTimestampHelper.CurrentTime();
                 this.BackupManager.CreateBackup();
                 this.BackupManager.DeleteBackups(this.Configuration.BackupRetention);
             }
@@ -201,7 +201,7 @@ namespace NeatNoter
 
         private void RunUpgradeBackup()
         {
-            this.Configuration.LastBackup = DateUtil.CurrentTime();
+            this.Configuration.LastBackup = UnixTimestampHelper.CurrentTime();
             this.BackupManager.CreateBackup("upgrade/v" + this.Configuration.PluginVersion + "_");
             this.BackupManager.DeleteBackups(this.Configuration.BackupRetention);
         }

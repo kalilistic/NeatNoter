@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 
 using Dalamud.DrunkenToad;
+using Dalamud.Logging;
 
 #pragma warning disable 618
 
@@ -86,7 +87,7 @@ namespace NeatNoter
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Failed to migrate.");
+                PluginLog.Error(ex, "Failed to migrate.");
                 return false;
             }
 

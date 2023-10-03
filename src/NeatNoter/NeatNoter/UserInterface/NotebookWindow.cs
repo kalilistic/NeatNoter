@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 
 using CheapLoc;
-using Dalamud.DrunkenToad;
-using Dalamud.Interface;
+using Dalamud.DrunkenToad.Helpers;
+using Dalamud.Interface.Utility;
 using ImGuiNET;
 
 namespace NeatNoter
@@ -150,6 +151,21 @@ namespace NeatNoter
             ImGui.End();
 
             return ret;
+        }
+
+        private static unsafe bool BeginTabItem(string label, ImGuiTabItemFlags flags)
+        {
+            var unterminatedLabelBytes = Encoding.UTF8.GetBytes(label);
+            var labelBytes = stackalloc byte[unterminatedLabelBytes.Length + 1];
+            fixed (byte* unterminatedPtr = unterminatedLabelBytes)
+            {
+                Buffer.MemoryCopy(unterminatedPtr, labelBytes, unterminatedLabelBytes.Length + 1, unterminatedLabelBytes.Length);
+            }
+
+            labelBytes[unterminatedLabelBytes.Length] = 0;
+
+            var num2 = (int)ImGuiNative.igBeginTabItem(labelBytes, null, flags);
+            return (uint)num2 > 0U;
         }
 
         private void SetWindowFlags()
@@ -385,13 +401,13 @@ namespace NeatNoter
         {
             if (ImGui.BeginTabBar("###NeatNoter_TabBar", ImGuiTabBarFlags.NoTooltip))
             {
-                if (ImGuiUtil.BeginTabItem(Loc.Localize("Notes", "Notes") + "###NeatNoter_TabItem_Notes", this.noteTabFlags))
+                if (BeginTabItem(Loc.Localize("Notes", "Notes") + "###NeatNoter_TabItem_Notes", this.noteTabFlags))
                 {
                     this.SetState(UIState.NoteIndex);
                     ImGui.EndTabItem();
                 }
 
-                if (ImGuiUtil.BeginTabItem(Loc.Localize("Categories", "Categories") + "###NeatNoter_TabItem_Categories", this.categoryTabFlags))
+                if (BeginTabItem(Loc.Localize("Categories", "Categories") + "###NeatNoter_TabItem_Categories", this.categoryTabFlags))
                 {
                     this.SetState(UIState.CategoryIndex);
                     ImGui.EndTabItem();
@@ -583,7 +599,7 @@ namespace NeatNoter
                 if (ImGui.InputText(document?.GetTypeName() + " " + Loc.Localize("Title", "Title"), ref title, 128))
                 {
                     document!.Name = title;
-                    document.Modified = DateUtil.CurrentTime();
+                    document.Modified = UnixTimestampHelper.CurrentTime();
                     this.IsNoteDirty = true;
                 }
             }
@@ -614,7 +630,7 @@ namespace NeatNoter
                 if (document != null)
                 {
                     document.Body = body;
-                    document.Modified = DateUtil.CurrentTime();
+                    document.Modified = UnixTimestampHelper.CurrentTime();
                     this.IsNoteDirty = true;
                 }
             }
@@ -624,7 +640,7 @@ namespace NeatNoter
                 if (document != null)
                 {
                     document.Body = this.previousNote;
-                    document.Modified = DateUtil.CurrentTime();
+                    document.Modified = UnixTimestampHelper.CurrentTime();
                     this.IsNoteDirty = true;
                 }
             }
