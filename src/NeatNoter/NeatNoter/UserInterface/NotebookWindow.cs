@@ -434,6 +434,7 @@ namespace NeatNoter
                 ? new Vector4(note.Categories[0].Color, 0.5f)
                 : new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
             ImGui.PushStyleColor(ImGuiCol.Button, color);
+            ImGui.PushStyleVar(ImGuiStyleVar.ButtonTextAlign, new Vector2(0.0f, 0.0f));
 
             var buttonLabel = note.Name;
             if (this.plugin.Configuration.ShowContentPreview)
@@ -443,34 +444,29 @@ namespace NeatNoter
                     buttonLabel = note.Name[..(cutNameLength - i)] + "...";
             }
 
-            if (ImGui.Button(note.IdentifierString, new Vector2(ElementSizeX, heightMod)) && !this.plugin.NotebookService.Loading)
+            if (ImGui.Button(buttonLabel + "###" + note.IdentifierString, new Vector2(ElementSizeX, heightMod)) && !this.plugin.NotebookService.Loading)
             {
                 this.OpenNote(note);
+            }
+
+            if (this.plugin.Configuration.ShowContentPreview)
+            {
+                var controlPosition = ImGui.GetItemRectMin();
+                var contentPreview = "| " + note.Body.Replace('\n', ' ');
+                var cutBodyLength = Math.Min(note.Body.Length, 400);
+
+                for (var i = 1; i < cutBodyLength && ImGui.CalcTextSize(contentPreview).X > ElementSizeX - lineOffset - fontScale; i++)
+                    contentPreview = "| " + note.Body.Replace('\n', ' ')[..(cutBodyLength - i)] + "...";
+
+                ImGui.GetWindowDrawList()
+                    .AddText(windowPos + new Vector2(lineOffset, controlPosition.Y - windowPos.Y), TextColor, contentPreview);
             }
 
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip(note.Name);
 
+            ImGui.PopStyleVar();
             ImGui.PopStyleColor();
-
-            var calc = (index * (heightMod + ImGui.GetStyle().ItemSpacing.Y)) + heightOffset;
-            var calcFont = calc + (ImGui.GetStyle().FramePadding.Y / 2);
-
-            // Adding the text over manually because otherwise the text position is dependent on label length
-            ImGui.GetWindowDrawList().AddText(windowPos + new Vector2(lineOffset - (ElementSizeX / 3.92f), calcFont), TextColor, buttonLabel);
-
-            var contentPreview = string.Empty;
-            if (this.plugin.Configuration.ShowContentPreview)
-            {
-                ImGui.GetWindowDrawList().AddLine(windowPos + new Vector2(lineOffset, calc), windowPos + new Vector2(lineOffset, calc + heightMod), TextColor);
-                contentPreview = note.Body.Replace('\n', ' ');
-            }
-
-            var cutBodyLength = Math.Min(note.Body.Length, 400);
-            for (var i = 1; i < cutBodyLength && ImGui.CalcTextSize(contentPreview).X > ElementSizeX - lineOffset - fontScale; i++)
-                contentPreview = note.Body.Replace('\n', ' ')[..(cutBodyLength - i)] + "...";
-            ImGui.GetWindowDrawList()
-                .AddText(windowPos + new Vector2(lineOffset + 10, calcFont), TextColor, contentPreview);
 
             if (ImGui.BeginPopupContextItem("###NeatNoter_" + note.IdentifierString))
             {
