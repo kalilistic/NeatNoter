@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Timers;
 
 using CheapLoc;
-using Dalamud.DrunkenToad;
 using Dalamud.DrunkenToad.Helpers;
 using Dalamud.Logging;
 using Newtonsoft.Json;
@@ -77,6 +77,76 @@ public class NotebookService : BaseRepository
         foreach (var document in list)
         {
             document.DecompressBody();
+        }
+    }
+
+    /// <summary>
+    /// Export Notes to a file.
+    /// </summary>
+    /// <returns>exported notes.</returns>
+    public string ExportNotes()
+    {
+        try
+        {
+            var configDirectory = NeatNoterPlugin.PluginInterface.GetPluginConfigDirectory();
+            if (!Directory.Exists(configDirectory))
+            {
+                Directory.CreateDirectory(configDirectory);
+            }
+
+            var exportDir = Path.Combine(configDirectory, "export");
+            if (!Directory.Exists(exportDir))
+            {
+                Directory.CreateDirectory(exportDir);
+            }
+
+            var currentNotes = this.GetNotes();
+            var notesToExport = new List<NoteExport>();
+
+            // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
+            foreach (var note in currentNotes)
+            {
+                notesToExport.Add(new NoteExport
+                {
+                    Name = note.Name,
+                    Id = note.Id,
+                    Body = string.IsNullOrEmpty(note.Body) ? "None" : note.Body,
+                    Created = note.Created,
+                    Modified = note.Modified,
+                    Categories = note.Categories.Any()
+                                     ? note.Categories.Select(category => category.Name).Aggregate((a, b) => a + "|" + b)
+                                     : "None",
+                });
+            }
+
+            // Generate filename with current time in Unix timestamp format
+            var timestamp = UnixTimestampHelper.CurrentTime();
+            var filename = $"export_{timestamp}.csv";
+            var fullPath = Path.Combine(exportDir, filename);
+
+            // Write notes to CSV
+            using (var writer = new StreamWriter(fullPath))
+            using (var csv = new CsvHelper.CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                // Write headers
+                csv.WriteHeader<NoteExport>();
+                csv.NextRecord();
+
+                // Write records
+                foreach (var note in notesToExport)
+                {
+                    csv.WriteRecord(note);
+                    csv.NextRecord();
+                }
+            }
+
+            PluginLog.Log($"Exported {notesToExport.Count} notes to {fullPath}.");
+            return $"Exported {notesToExport.Count} notes to {fullPath}.";
+        }
+        catch (Exception ex)
+        {
+            PluginLog.Error(ex, "Failed to export notes.");
+            return "Failed to export notes: " + ex.Message;
         }
     }
 

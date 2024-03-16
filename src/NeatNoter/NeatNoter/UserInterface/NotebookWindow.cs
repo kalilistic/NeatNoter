@@ -6,6 +6,7 @@ using System.Text;
 
 using CheapLoc;
 using Dalamud.DrunkenToad.Helpers;
+using Dalamud.Interface.Colors;
 using Dalamud.Interface.Utility;
 using ImGuiNET;
 
@@ -34,6 +35,8 @@ namespace NeatNoter
         private const int MaxNoteSize = 1024 * 4196; // You can fit the complete works of Shakespeare in 3.5MB, so this is probably fine.
         private static readonly uint TextColor = ImGui.GetColorU32(ImGuiCol.Text);
 
+        private string exportResult = string.Empty;
+        private bool isDeprecationWarningVisible = true;
         private bool categoryWindowVisible;
         private bool deletionWindowVisible;
         private bool backgroundVisible;
@@ -104,6 +107,33 @@ namespace NeatNoter
         public override void Draw()
         {
             this.SetWindowFlags();
+            if (this.isDeprecationWarningVisible)
+            {
+                ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudYellow);
+                ImGui.TextWrapped("NeatNoter will stop working with Dawntrail's launch and won't get updates.\n" +
+                                  "Please use the Export Button below to save your notes as a CSV file.\n" +
+                                  "Look into other plugins like NOTED or other note taking tools.\n" +
+                                  "You'll see this message when the game starts, but you can access your notes by clicking OK.\n" +
+                                  "Thank you for using NeatNoter!");
+                ImGui.PopStyleColor();
+
+                ImGui.Spacing();
+                if (ImGui.Button("Export"))
+                {
+                    this.exportResult = this.plugin.NotebookService.ExportNotes();
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Button("OK"))
+                {
+                    this.isDeprecationWarningVisible = false;
+                }
+
+                ImGui.Text(this.exportResult);
+
+                return;
+            }
+
             switch (this.state)
             {
                 case UIState.NoteIndex:

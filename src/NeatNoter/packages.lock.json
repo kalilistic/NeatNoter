@@ -2,6 +2,12 @@
   "version": 1,
   "dependencies": {
     "net7.0-windows7.0": {
+      "CsvHelper": {
+        "type": "Direct",
+        "requested": "[31.0.2, )",
+        "resolved": "31.0.2",
+        "contentHash": "ndlIN77XcFm6qqGlNPzl0XjVupMCBVhVSiO+1+X2UhJtnnvkx9f//7FOvlkLuEQ76NC3Y7owa8IOhgtKVa4H7Q=="
+      },
       "Dalamud.DrunkenToad": {
         "type": "Direct",
         "requested": "[1.7.2, )",
